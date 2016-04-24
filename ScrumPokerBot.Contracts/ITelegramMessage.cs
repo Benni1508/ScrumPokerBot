@@ -4,9 +4,6 @@ namespace ScrumPokerBot.Contracts
     {
         long ChatId { get; }
         PokerUser User { get; }
-
         string Message { get; }
-
-
     }
 }

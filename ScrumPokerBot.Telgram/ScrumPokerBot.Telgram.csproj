@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="BotService.cs" />
     <Compile Include="IMessageFactory.cs" />
+    <Compile Include="MessageFactory.cs" />
     <Compile Include="TelegramNinjectModule.cs" />
     <Compile Include="IBotService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

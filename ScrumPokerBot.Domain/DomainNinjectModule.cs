@@ -6,9 +6,9 @@ namespace ScrumPokerBot.Domain
     {
         public override void Load()
         {
-            this.Bind<IScrumPokerService>().To<ScrumPokerService>().InSingletonScope();
-            this.Bind<IMessageSender>().To<MessageSender>();
-            this.Bind<IIdGenerator>().To<IdGenerator>();
+            Bind<IScrumPokerService>().To<ScrumPokerService>().InSingletonScope();
+            Bind<IMessageSender>().To<MessageSender>();
+            Bind<IIdGenerator>().To<IdGenerator>();
         }
     }
 }

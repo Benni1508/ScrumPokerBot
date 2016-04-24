@@ -7,5 +7,4 @@ namespace ScrumPokerBot.Domain
     {
         event EventHandler<ITelegramMessage> MessageReceived;
     }
-
 }

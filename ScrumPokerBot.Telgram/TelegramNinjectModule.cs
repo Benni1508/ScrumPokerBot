@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using Ninject.Modules;
 using ScrumPokerBot.Domain;
 using Telegram.Bot;
@@ -11,9 +9,10 @@ namespace ScrumPokerBot.Telgram
     {
         public override void Load()
         {
-            this.Bind<Api>().ToConstant(new Api("API Key")).InSingletonScope();
-            this.Bind<IBotService, IMessageReceiver>().To<BotService>().InSingletonScope();
-            this.Bind<IMessageFactory>().To<MessageFactory>();
+            var apikey = File.ReadAllText("C:\\Temp\\ApiKey.txt");
+            Bind<Api>().ToConstant(new Api(apikey)).InSingletonScope();
+            Bind<IBotService, IMessageReceiver>().To<BotService>().InSingletonScope();
+            Bind<IMessageFactory>().To<MessageFactory>();
         }
     }
 }

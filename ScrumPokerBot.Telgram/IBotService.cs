@@ -1,5 +1,3 @@
-using System;
-
 namespace ScrumPokerBot.Telgram
 {
     public interface IBotService

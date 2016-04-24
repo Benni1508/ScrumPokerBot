@@ -10,10 +10,10 @@ namespace ScrumPokerBot.Contracts
 
         public PokerUser(Chat chat)
         {
-            this.Username = chat.Username;
-            this.Firstname = chat.FirstName;
-            this.Lastname = chat.LastName;
-            this.ChatId = chat.Id;
+            Username = chat.Username;
+            Firstname = chat.FirstName;
+            Lastname = chat.LastName;
+            ChatId = chat.Id;
         }
 
         public string Username { get; set; }

@@ -16,7 +16,7 @@ namespace ScrumPokerBot.Telgram
 
         public BotService(Api bot, IMessageFactory messageFactory)
         {
-            this.firstRun = true;
+            firstRun = true;
             this.bot = bot;
             this.messageFactory = messageFactory;
         }
@@ -30,17 +30,19 @@ namespace ScrumPokerBot.Telgram
         {
         }
 
+        public event EventHandler<ITelegramMessage> MessageReceived;
+
         private async Task Runner()
         {
-            
             var offset = 0;
             while (true)
             {
+         
                 var updates = await bot.GetUpdates(offset);
-       
+
                 if (firstRun)
                 {
-                    offset = updates.Last().Id +1;
+                    offset = updates.Last().Id + 1;
                     Console.WriteLine($"Skip {offset} Messages!");
                     firstRun = false;
                     continue;
@@ -52,15 +54,13 @@ namespace ScrumPokerBot.Telgram
                     if (update.Message != null && update.Message.Type == MessageType.TextMessage)
                     {
                         var message = messageFactory.Create(update.Message);
-                        this.OnMessageReceived(message);
+                        OnMessageReceived(message);
                     }
                 }
 
                 await Task.Delay(1000);
             }
         }
-
-        public event EventHandler<ITelegramMessage> MessageReceived;
 
         protected virtual void OnMessageReceived(ITelegramMessage e)
         {

@@ -112,8 +112,8 @@ namespace ScrumPokerBot.Domain
                 if (telegramMessage is EstimationMessage)
                 {
                     var estimationMessage = telegramMessage as EstimationMessage;
-                    var session = this.GetSessionForUser(telegramMessage.User);
-                    var pokerSession = this.runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
+                    var session = GetSessionForUser(telegramMessage.User);
+                    var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
                     var userEstimation =
                         pokerSession.Users.FirstOrDefault(ue => ue.UserId == telegramMessage.User.ChatId);
                     if (userEstimation != null && !userEstimation.EstimationReceived)
@@ -137,44 +137,14 @@ namespace ScrumPokerBot.Domain
         {
             if (pokerSession.Users.All(u => u.EstimationReceived))
             {
-                this.messageSender.SendPokerResult(session, pokerSession);
-                this.runningPokers.Remove(pokerSession);
+                messageSender.SendPokerResult(session, pokerSession);
+                runningPokers.Remove(pokerSession);
             }
         }
 
         private ScrumPokerSession GetSession(int sessionId)
         {
             return ScrumPokerSessions.SingleOrDefault(s => s.Id == sessionId);
-        }
-    }
-
-    public class RunningPoker
-    {
-        public RunningPoker(ScrumPokerSession session)
-        {
-            Users = session.AllUsers.Select(u => new UserEstimation(u.ChatId)).ToList();
-            SessionId = session.Id;
-        }
-
-        public int SessionId { get; }
-        public List<UserEstimation> Users { get; set; }
-    }
-
-    public class UserEstimation
-    {
-        public UserEstimation(long userId)
-        {
-            UserId = userId;
-        }
-
-        public int Estimation { get; private set; }
-        public long UserId { get; }
-        public bool EstimationReceived { get; private set; }
-
-        public void SetEstimation(int estimation)
-        {
-            this.EstimationReceived = true;
-            this.Estimation = estimation;
         }
     }
 }
