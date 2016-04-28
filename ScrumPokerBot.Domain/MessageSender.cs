@@ -86,6 +86,12 @@ namespace ScrumPokerBot.Domain
             }
         }
 
+        public void NoPokerRunning(PokerUser user)
+        {
+            var text = "Aktuell läuft keine Pokersession.";
+            bot.SendTextMessage(user.ChatId, text);
+        }
+
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {
             var masterText = $"Der Benutzer {any.Lastname}, {any.Firstname} wurde der Session hinzugefügt.";

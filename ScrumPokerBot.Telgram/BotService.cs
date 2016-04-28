@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ScrumPokerBot.Contracts;
@@ -30,14 +31,17 @@ namespace ScrumPokerBot.Telgram
         {
         }
 
-        public event EventHandler<ITelegramMessage> MessageReceived;
+        public event EventHandler<ConnectSessionMessage> ConnectedMessageReceived;
+        public event EventHandler<EstimationMessage> EstimationMessageReceived;
+        public event EventHandler<StartSessionMessage> StartSessionMessageReceived;
+        public event EventHandler<StartPokerMessage> StartPokerMessageReceived;
+        public event EventHandler<UnknownCommandMessage> UnknownMessageReceived;
 
         private async Task Runner()
         {
             var offset = 0;
             while (true)
             {
-         
                 var updates = await bot.GetUpdates(offset);
 
                 if (firstRun)
@@ -64,7 +68,55 @@ namespace ScrumPokerBot.Telgram
 
         protected virtual void OnMessageReceived(ITelegramMessage e)
         {
-            MessageReceived?.Invoke(this, e);
+            if (e is ConnectSessionMessage)
+            {
+                OnConnectedMessageReceived(e as ConnectSessionMessage);
+            }
+            else if (e is EstimationMessage)
+            {
+                OnEstimationMessageReceived(e as EstimationMessage);
+            }
+            else if (e is StartSessionMessage)
+            {
+                OnStartSessionMessageReceived(e as StartSessionMessage);
+            }
+            else if (e is StartPokerMessage)
+            {
+                OnStartPokerMessageReceived(e as StartPokerMessage);
+            }
+            else if (e is UnknownCommandMessage)
+            {
+                OnUnknownMessageReceived(e as UnknownCommandMessage);
+            }
+            else
+            {
+                throw new KeyNotFoundException();                
+            }
+        }
+
+        protected virtual void OnEstimationMessageReceived(EstimationMessage e)
+        {
+            EstimationMessageReceived?.Invoke(this, e);
+        }
+
+        protected virtual void OnStartSessionMessageReceived(StartSessionMessage e)
+        {
+            StartSessionMessageReceived?.Invoke(this, e);
+        }
+
+        protected virtual void OnStartPokerMessageReceived(StartPokerMessage e)
+        {
+            StartPokerMessageReceived?.Invoke(this, e);
+        }
+
+        protected virtual void OnUnknownMessageReceived(UnknownCommandMessage e)
+        {
+            UnknownMessageReceived?.Invoke(this, e);
+        }
+
+        protected virtual void OnConnectedMessageReceived(ConnectSessionMessage e)
+        {
+            ConnectedMessageReceived?.Invoke(this, e);
         }
     }
 }

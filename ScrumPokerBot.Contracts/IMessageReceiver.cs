@@ -5,6 +5,10 @@ namespace ScrumPokerBot.Domain
 {
     public interface IMessageReceiver
     {
-        event EventHandler<ITelegramMessage> MessageReceived;
+        event EventHandler<ConnectSessionMessage> ConnectedMessageReceived;
+        event EventHandler<EstimationMessage> EstimationMessageReceived;
+        event EventHandler<StartSessionMessage> StartSessionMessageReceived;
+        event EventHandler<StartPokerMessage> StartPokerMessageReceived;
+        event EventHandler<UnknownCommandMessage> UnknownMessageReceived;
     }
 }

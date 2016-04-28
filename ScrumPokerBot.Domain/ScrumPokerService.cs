@@ -46,7 +46,11 @@ namespace ScrumPokerBot.Domain
 
         public void StartService()
         {
-            messageReceiver.MessageReceived += MessageReceiverOnMessageReceived;
+            messageReceiver.ConnectedMessageReceived += MessageReceiverOnConnectedMessageReceived;
+            messageReceiver.EstimationMessageReceived += MessageReceiverOnEstimationMessageReceived;
+            messageReceiver.StartPokerMessageReceived += MessageReceiverOnStartPokerMessageReceived;
+            messageReceiver.StartSessionMessageReceived += MessageReceiverOnStartSessionMessageReceived;
+            messageReceiver.UnknownMessageReceived += MessageReceiverOnUnknownMessageReceived;
         }
 
         public void EndSession(int sessionId)
@@ -84,62 +88,55 @@ namespace ScrumPokerBot.Domain
             return session;
         }
 
-        private void MessageReceiverOnMessageReceived(object sender, ITelegramMessage telegramMessage)
+        private void MessageReceiverOnUnknownMessageReceived(object sender, UnknownCommandMessage unknownCommandMessage)
         {
-            try
-            {
-                if (telegramMessage is StartSessionMessage)
-                {
-                    StartNewSession(telegramMessage.User);
-                }
-                if (telegramMessage is ConnectSessionMessage)
-                {
-                    var connectedMessage = (ConnectSessionMessage) telegramMessage;
-                    AddUserToSession(telegramMessage.User, connectedMessage.Sessionid);
-                }
-                if (telegramMessage is StartPokerMessage)
-                {
-                    var session = GetSessionForUser(telegramMessage.User);
-                    if (session == null)
-                    {
-                        messageSender.NoSessionForUser(telegramMessage.User);
-                        return;
-                    }
-                    var startMessage = telegramMessage as StartPokerMessage;
-                    StartPoker(session.Id, startMessage.Description, startMessage.ChatId);
-                }
+            messageSender.SendUnknownCommand(unknownCommandMessage);
+        }
 
-                if (telegramMessage is EstimationMessage)
-                {
-                    var estimationMessage = telegramMessage as EstimationMessage;
-                    var session = GetSessionForUser(telegramMessage.User);
-                    var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
-                    var userEstimation =
-                        pokerSession.Users.FirstOrDefault(ue => ue.UserId == telegramMessage.User.ChatId);
-                    if (userEstimation != null && !userEstimation.EstimationReceived)
-                    {
-                        userEstimation.SetEstimation(estimationMessage.Estimation);
-                    }
-                    ValidateEstimation(pokerSession, session);
-                }
-                if (telegramMessage is UnknownCommandMessage)
-                {
-                    messageSender.SendUnknownCommand(telegramMessage);
-                }
-            }
-            catch (Exception e)
+        private void MessageReceiverOnStartSessionMessageReceived(object sender, StartSessionMessage startSessionMessage)
+        {
+            StartNewSession(startSessionMessage.User);
+        }
+
+        private void MessageReceiverOnStartPokerMessageReceived(object sender, StartPokerMessage startPokerMessage)
+        {
+            var session = GetSessionForUser(startPokerMessage.User);
+            if (session == null)
             {
-                Console.WriteLine(e.ToString());
+                messageSender.NoSessionForUser(startPokerMessage.User);
+                return;
             }
+            StartPoker(session.Id, startPokerMessage.Description, startPokerMessage.ChatId);
+        }
+
+        private void MessageReceiverOnEstimationMessageReceived(object sender, EstimationMessage estimationMessage)
+        {
+            var session = GetSessionForUser(estimationMessage.User);
+            var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
+            if (pokerSession == null)
+            {
+                this.messageSender.NoPokerRunning(estimationMessage.User);
+            }
+            var userEstimation = pokerSession.Users.FirstOrDefault(ue => ue.UserId == estimationMessage.User.ChatId);
+            if (userEstimation != null && !userEstimation.EstimationReceived)
+            {
+                userEstimation.SetEstimation(estimationMessage.Estimation);
+            }
+            ValidateEstimation(pokerSession, session);
+        }
+
+        private void MessageReceiverOnConnectedMessageReceived(object sender,
+            ConnectSessionMessage connectSessionMessage)
+        {
+            AddUserToSession(connectSessionMessage.User, connectSessionMessage.Sessionid);
         }
 
         private void ValidateEstimation(RunningPoker pokerSession, ScrumPokerSession session)
         {
-            if (pokerSession.Users.All(u => u.EstimationReceived))
-            {
-                messageSender.SendPokerResult(session, pokerSession);
-                runningPokers.Remove(pokerSession);
-            }
+            if (!pokerSession.Users.All(u => u.EstimationReceived)) return;
+
+            messageSender.SendPokerResult(session, pokerSession);
+            runningPokers.Remove(pokerSession);
         }
 
         private ScrumPokerSession GetSession(int sessionId)
