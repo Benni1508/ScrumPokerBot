@@ -29,5 +29,6 @@ namespace ScrumPokerBot.Domain.Tests
             message.IsValid.Should().BeFalse();
             message.Estimation.Should().Be(0);
         }
+
     }
 }

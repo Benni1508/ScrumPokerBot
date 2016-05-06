@@ -36,7 +36,7 @@ namespace ScrumPokerBot.Domain
         public void Handle(StartPokerMessage message)
         {
 
-            service.StartPoker(message.User, message.Description, message.User.ChatId);
+            service.StartPoker(message.User, message.Description);
         }
 
         public void Handle(EstimationMessage message)

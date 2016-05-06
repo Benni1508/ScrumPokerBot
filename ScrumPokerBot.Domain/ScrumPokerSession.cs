@@ -16,10 +16,13 @@ namespace ScrumPokerBot.Domain
             MasterUser = user;
         }
 
-        public int Id { get; set; }
-        public long ChatId { get; }
+        public int Id { get; }
         public PokerUser MasterUser { get; }
+
+
         public PokerUser[] AllUsers => users.ToArray();
+        public bool CanStartPoker { get { return this.Poker == null; } }
+        public RunningPoker Poker { get; private set; }
 
         public void AddUser(PokerUser user)
         {
@@ -33,6 +36,37 @@ namespace ScrumPokerBot.Domain
             {
                 users.Remove(foundUser);
             }
+        }
+
+        public void StartPoker()
+        {
+            this.Poker = new RunningPoker(this);
+        }
+
+        public bool Estimate(PokerUser user, int estimation)
+        {
+            var userEstimation = this.Poker.Users.FirstOrDefault(ue => ue.ChatId == user.ChatId);
+            if (userEstimation != null && !userEstimation.EstimationReceived)
+            {
+                userEstimation.SetEstimation(estimation);
+            }
+            return IsEstimationCompleted();
+        }
+
+        private bool IsEstimationCompleted()
+        {
+            return this.Poker.Users.All(u => u.EstimationReceived);
+        }
+
+        public void ClearPoker()
+        {
+            this.Poker = null;
+        }
+
+        public bool CanUserEstimate(PokerUser user)
+        {
+            var estimation = this.Poker.Users.FirstOrDefault(u => u.ChatId == user.ChatId);
+            return !estimation.EstimationReceived;
         }
     }
 }

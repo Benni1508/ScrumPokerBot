@@ -8,7 +8,6 @@ namespace ScrumPokerBot.Domain
     {
         private readonly IIdGenerator idGenerator;
         private readonly IMessageSender messageSender;
-        private readonly List<RunningPoker> runningPokers = new List<RunningPoker>();
 
         public ScrumPokerService(IMessageSender messageSender, IIdGenerator idGenerator)
         {
@@ -52,7 +51,7 @@ namespace ScrumPokerBot.Domain
             session.RemoveUser(user);
         }
 
-        public void StartPoker(PokerUser user, string description, long requesterChatId)
+        public void StartPoker(PokerUser user, string description)
         {
             var session = GetSession(user);
             if (session == null)
@@ -60,12 +59,11 @@ namespace ScrumPokerBot.Domain
                 messageSender.NoSessionForUser(user);
                 return;
             }
-            if (runningPokers.Any(r => r.SessionId == session.Id))
+            if (!session.CanStartPoker)
             {
-                messageSender.PokerAlreadyRunning(requesterChatId);
+                messageSender.PokerAlreadyRunning(user.ChatId);
             }
-
-            runningPokers.Add(new RunningPoker(session));
+            session.StartPoker();
             messageSender.SendPokerToUsers(session.AllUsers, description);
         }
 
@@ -75,13 +73,7 @@ namespace ScrumPokerBot.Domain
             return session;
         }
 
-        private void ValidateEstimation(RunningPoker pokerSession, ScrumPokerSession session)
-        {
-            if (!pokerSession.Users.All(u => u.EstimationReceived)) return;
 
-            messageSender.SendPokerResult(session, pokerSession);
-            runningPokers.Remove(pokerSession);
-        }
 
         private ScrumPokerSession GetSession(int sessionId)
         {
@@ -91,19 +83,19 @@ namespace ScrumPokerBot.Domain
         public void Estimate(PokerUser user, int estimation)
         {
             var session = GetSession(user);
-            var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
-            if (pokerSession == null)
+            if (session.CanStartPoker)
             {
                 messageSender.NoPokerRunning(user);
                 return;
             }
-
-            var userEstimation = pokerSession.Users.FirstOrDefault(ue => ue.UserId == user.ChatId);
-            if (userEstimation != null && !userEstimation.EstimationReceived)
+            else if (!session.CanUserEstimate(user))
             {
-                userEstimation.SetEstimation(estimation);
+                this.messageSender.EstimationAlreadyCounted(user);
             }
-            ValidateEstimation(pokerSession, session);
+            if (!session.Estimate(user, estimation)) return;
+
+            this.messageSender.SendPokerResult(session);
+            session.ClearPoker();
         }
     }
 }

@@ -72,9 +72,9 @@ namespace ScrumPokerBot.Domain
             }
         }
 
-        public void SendPokerResult(ScrumPokerSession session, RunningPoker pokerSession)
+        public void SendPokerResult(ScrumPokerSession session)
         {
-            var x = pokerSession.Users.GroupBy(u => u.Estimation);
+            var x = session.Poker.Users.GroupBy(u => u.Estimation);
             var results = x.ToDictionary(k => k.Key, v => v.Count());
             var sb = new StringBuilder();
             foreach (var result in results)
@@ -105,6 +105,12 @@ namespace ScrumPokerBot.Domain
             var userText = "Du hast die Session verlassen";
             bot.SendTextMessage(masterUser.ChatId, masterText);
             bot.SendTextMessage(user.ChatId, userText);
+        }
+
+        public void EstimationAlreadyCounted(PokerUser user)
+        {
+            var text = "Du hast bereits eine Schätzung abgegeben!";
+            this.bot.SendTextMessage(user.ChatId, text);
         }
 
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)

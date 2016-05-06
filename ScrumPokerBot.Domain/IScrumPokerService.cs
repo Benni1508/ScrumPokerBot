@@ -9,7 +9,7 @@ namespace ScrumPokerBot.Domain
         List<ScrumPokerSession> ScrumPokerSessions { get; }
         int StartNewSession(PokerUser user);
         void ConnectToSession(PokerUser user, int sessionId);
-        void StartPoker(PokerUser user, string description, long requesterChatId);
+        void StartPoker(PokerUser user, string description);
         void LeaveSession(PokerUser user);
         void Estimate(PokerUser user, int estimation);
     }

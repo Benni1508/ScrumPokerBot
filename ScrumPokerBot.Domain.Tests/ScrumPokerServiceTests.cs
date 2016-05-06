@@ -75,6 +75,57 @@ namespace ScrumPokerBot.Domain.Tests
 
             messageSender.Received().UserAlreadyInSession(Arg.Any<PokerUser>());
         }
+
+
+
+        [Fact]
+        public void Estimation()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.ConnectToSession(TestHelpers.GetTestUser(2),12);
+            
+            this.messageSender.ClearReceivedCalls();
+            service.StartPoker(TestHelpers.GetTestUser(1), "");
+            service.Estimate(TestHelpers.GetTestUser(1), 1); 
+            
+            this.messageSender.DidNotReceive().SendPokerResult(Arg.Any<ScrumPokerSession>());
+            service.Estimate(TestHelpers.GetTestUser(2), 3);
+            this.messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>());
+
+
+        }
+
+        [Fact]
+        public void Estimation_Double()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.ConnectToSession(TestHelpers.GetTestUser(2),12);
+            service.ConnectToSession(TestHelpers.GetTestUser(3),12);
+            
+            this.messageSender.ClearReceivedCalls();
+            service.StartPoker(TestHelpers.GetTestUser(1), "");
+            service.Estimate(TestHelpers.GetTestUser(1), 1);
+            service.Estimate(TestHelpers.GetTestUser(2), 3);
+
+            service.Estimate(TestHelpers.GetTestUser(2), 3);
+            this.messageSender.Received().EstimationAlreadyCounted(Arg.Any<PokerUser>());
+
+            service.Estimate(TestHelpers.GetTestUser(3), 3);
+            messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>());
+        }
+
+        [Fact]
+        public void Estimate_WithoutRunningPoker()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.ConnectToSession(TestHelpers.GetTestUser(2),12);
+            service.ConnectToSession(TestHelpers.GetTestUser(3),12);
+            
+            this.messageSender.ClearReceivedCalls();
+            service.Estimate(TestHelpers.GetTestUser(1), 1);
+
+            messageSender.Received().NoPokerRunning(Arg.Any<PokerUser>());
+        }
     }
 
 }

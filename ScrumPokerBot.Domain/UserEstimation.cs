@@ -2,13 +2,13 @@ namespace ScrumPokerBot.Domain
 {
     public class UserEstimation
     {
-        public UserEstimation(long userId)
+        public UserEstimation(long chatId)
         {
-            UserId = userId;
+            ChatId = chatId;
         }
 
         public int Estimation { get; private set; }
-        public long UserId { get; }
+        public long ChatId { get; }
         public bool EstimationReceived { get; private set; }
 
         public void SetEstimation(int estimation)
