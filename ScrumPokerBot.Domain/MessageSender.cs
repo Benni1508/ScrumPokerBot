@@ -41,7 +41,7 @@ namespace ScrumPokerBot.Domain
         public void SendUnknownCommand(ITelegramMessage message)
         {
             var text = $"Der Befehl \"{message.Message}\" ist nicht unbekannt!";
-            bot.SendTextMessage(message.ChatId, text);
+            bot.SendTextMessage(message.User.ChatId, text);
         }
 
         public void NoSessionFound(PokerUser user, int sessionId)

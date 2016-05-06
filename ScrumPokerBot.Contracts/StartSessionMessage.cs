@@ -2,7 +2,7 @@ namespace ScrumPokerBot.Contracts
 {
     public class StartSessionMessage : TelegramMessageBase
     {
-        public StartSessionMessage(long chatId, PokerUser user, string message) : base(chatId, user, message)
+        public StartSessionMessage(PokerUser user, string message) : base( user, message)
         {
         }
 

@@ -13,7 +13,7 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void CreateMessage()
         {
-            var message = new ConnectSessionMessage(1, TestHelpers.GetTestUser(1), "/connect 12");
+            var message = new ConnectSessionMessage(TestHelpers.GetTestUser(1), "/connect 12");
             message.Sessionid.Should().Be(12);
             message.IsValid.Should().BeTrue();
         }
@@ -21,7 +21,7 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void CreateMessage2()
         {
-            var message = new ConnectSessionMessage(1, TestHelpers.GetTestUser(1), "/connect qw");
+            var message = new ConnectSessionMessage(TestHelpers.GetTestUser(1), "/connect qw");
             message.Sessionid.Should().Be(0);
             message.IsValid.Should().BeFalse();
         }
@@ -29,7 +29,7 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void CreateMessage3()
         {
-            var message = new ConnectSessionMessage(1, TestHelpers.GetTestUser(1), "/connect qw");
+            var message = new ConnectSessionMessage(TestHelpers.GetTestUser(1), "/connect qw");
             message.Sessionid.Should().Be(0);
             message.IsValid.Should().BeFalse();
         }
@@ -48,21 +48,21 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void MessageTest1()
         {
-            var message = new StartPokerMessage(1, TestHelpers.GetTestUser(1), "/poker qw");
+            var message = new StartPokerMessage(TestHelpers.GetTestUser(1), "/poker qw");
             message.Description.Should().Be("qw");
         }
 
         [Fact]
         public void MessageTest2()
         {
-            var message = new StartPokerMessage(1, TestHelpers.GetTestUser(1), "/poker");
+            var message = new StartPokerMessage(TestHelpers.GetTestUser(1), "/poker");
             message.Description.Should().Be("");
         }
 
         [Fact]
         public void MessageTest3()
         {
-            var message = new StartPokerMessage(1, TestHelpers.GetTestUser(1), "/poker Enter BLI here");
+            var message = new StartPokerMessage(TestHelpers.GetTestUser(1), "/poker Enter BLI here");
             message.Description.Should().Be("Enter BLI here");
         }
     }
@@ -72,7 +72,7 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void MessageTest1()
         {
-            var message = new EstimationMessage(1, TestHelpers.GetTestUser(1), "1 Story Points");
+            var message = new EstimationMessage(TestHelpers.GetTestUser(1), "1 Story Points");
             message.IsValid.Should().BeTrue();
             message.Estimation.Should().Be(1);
         }
@@ -80,7 +80,7 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void MessageTest2()
         {
-            var message = new EstimationMessage(1, TestHelpers.GetTestUser(1), "Story Points");
+            var message = new EstimationMessage(TestHelpers.GetTestUser(1), "Story Points");
             message.IsValid.Should().BeFalse();
             message.Estimation.Should().Be(0);
         }
@@ -88,7 +88,7 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void MessageTest3()
         {
-            var message = new EstimationMessage(1, TestHelpers.GetTestUser(1), "asd Story Points");
+            var message = new EstimationMessage(TestHelpers.GetTestUser(1), "asd Story Points");
             message.IsValid.Should().BeFalse();
             message.Estimation.Should().Be(0);
         }
@@ -106,41 +106,50 @@ namespace ScrumPokerBot.Domain.Tests
             var idGenerator = Substitute.For<IIdGenerator>();
             messageReceiver = Substitute.For<IMessageReceiver>();
             idGenerator.GetId().Returns(12);
-            service = new ScrumPokerService(messageSender, idGenerator, messageReceiver);
+            service = new ScrumPokerService(messageSender, idGenerator);
         }
 
         [Fact]
         public void StartNewSession_ShouldReturnsSessionid()
         {
-            var result = service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.OnStartSessionMessageReceived(GetStartSession(123));
             service.ScrumPokerSessions.Count.Should().Be(1);
             service.ScrumPokerSessions.First().MasterUser.ChatId.Should().Be(123);
-            result.Should().Be(12);
+        }
+
+        private StartSessionMessage GetStartSession(int userChat)
+        {
+            return new StartSessionMessage(TestHelpers.GetTestUser(userChat), "/Startsession");
+        }
+
+        private ConnectSessionMessage GetConnectSession(int userChat, int id)
+        {
+            return new ConnectSessionMessage(TestHelpers.GetTestUser(userChat), $"/Connect {id}");
         }
 
         [Fact]
         public void ConnectWithWrongId_InformsUser()
         {
-            service.AddUserToSession(TestHelpers.GetTestUser(1), 1);
+            var message = GetConnectSession(1, 1);
+            service.OnConnectedMessageReceived(message);
             messageSender.Received().NoSessionFound(Arg.Any<PokerUser>(), 1);
         }
 
         [Fact]
         public void Test1()
         {
-            var sessionId = service.StartNewSession(TestHelpers.GetTestUser(2));
-            service.AddUserToSession(TestHelpers.GetTestUser(1), sessionId);
-            messageSender.Received()
-                .InformaAddedUserAndMaster(Arg.Is<PokerUser>(p => p.ChatId == 1), Arg.Is<PokerUser>(p => p.ChatId == 2));
+            service.OnStartSessionMessageReceived(GetStartSession(1));
+            service.OnConnectedMessageReceived(GetConnectSession(2,12));
+            messageSender.Received().InformaAddedUserAndMaster(Arg.Is<PokerUser>(p => p.ChatId == 2), Arg.Is<PokerUser>(p => p.ChatId == 1));
         }
 
         [Fact]
         public void EndSession_ShouldInformUsers()
         {
-            var result = service.StartNewSession(TestHelpers.GetTestUser(123));
-            service.AddUserToSession(TestHelpers.GetTestUser(2),result);
+            service.OnStartSessionMessageReceived(GetStartSession(123));
+            service.OnConnectedMessageReceived(GetConnectSession(2,12));
 
-            service.LeaveSession(TestHelpers.GetTestUser(2));
+            service.OnLeaveSessionMessageReceived(new LeaveSessionMessage(TestHelpers.GetTestUser(2),"/leaveSession"));
 
             service.ScrumPokerSessions.Count.Should().Be(1);
             messageSender.Received().SendUserLeaveSession(Arg.Is<PokerUser>(u => u.ChatId == 123), Arg.Is<PokerUser>(u => u.ChatId== 2));
@@ -149,8 +158,8 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void AddUserToRunningSession()
         {
-            var result = service.StartNewSession(TestHelpers.GetTestUser(123));
-            service.AddUserToSession(TestHelpers.GetTestUser(2), result);
+            service.OnStartSessionMessageReceived(GetStartSession(123));
+            service.OnConnectedMessageReceived(GetConnectSession(2,12));;
             service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(2);
 
             messageSender.Received().InformaAddedUserAndMaster(Arg.Any<PokerUser>(), Arg.Any<PokerUser>());
@@ -158,8 +167,8 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void StartTwoSessions()
         {
-            service.StartNewSession(TestHelpers.GetTestUser(123));
-            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.OnStartSessionMessageReceived(GetStartSession(123));
+            service.OnStartSessionMessageReceived(GetStartSession(123));
 
             service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(1);
 

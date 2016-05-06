@@ -4,10 +4,10 @@ namespace ScrumPokerBot.Contracts
 {
     public class ConnectSessionMessage : TelegramMessageBase
     {
-        public ConnectSessionMessage(long chatId, PokerUser user, string message)
-            : base(chatId, user, message)
+        public ConnectSessionMessage(PokerUser user, string message)
+            : base(user, message)
         {
-            var regex = new Regex(regexPattern);
+            var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
             if (!regex.IsMatch(message)) return;
 
             var matches = regex.Match(message);

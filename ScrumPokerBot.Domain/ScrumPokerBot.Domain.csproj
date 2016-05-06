@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="DomainNinjectModule.cs" />
     <Compile Include="IdGenerator.cs" />
+    <Compile Include="MessageDispatcher.cs" />
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageSender.cs" />
     <Compile Include="RunningPoker.cs" />

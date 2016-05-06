@@ -5,21 +5,18 @@ namespace ScrumPokerBot.Domain
 {
     public interface IMessageReceiver
     {
-        event EventHandler<ConnectEventArgs> ConnectedMessageReceived;
-        event EventHandler<EstimationEventArgs> EstimationMessageReceived;
-        event EventHandler<StartSessionEventArgs> StartSessionMessageReceived;
-        event EventHandler<StartPokerEventArgs> StartPokerMessageReceived;
-        event EventHandler<UnknownCommandEventArgs> UnknownMessageReceived;
-        event EventHandler<LeaveSessionEventArgs> LeaveSessionMessageReceived;
+        event EventHandler<MessageReceivedEventArgs> MessageReceived; 
+
     }
 
-    public class LeaveSessionEventArgs :EventArgs
+    public class MessageReceivedEventArgs : EventArgs
     {
-        public LeaveSessionEventArgs(LeaveSessionMessage leaveSessionMessage)
+        public MessageReceivedEventArgs(ITelegramMessage telegramMessage)
         {
-            LeaveSessionMessage = leaveSessionMessage;
+            TelegramMessage = telegramMessage;
         }
 
-        public LeaveSessionMessage LeaveSessionMessage { get;}
+        public ITelegramMessage TelegramMessage { get; }
     }
+
 }

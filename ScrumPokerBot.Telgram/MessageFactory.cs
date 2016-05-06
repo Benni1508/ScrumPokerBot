@@ -12,7 +12,7 @@ namespace ScrumPokerBot.Telgram
             var from = message.From;
             var user = new PokerUser(message.Chat);
 
-            var estimation = new EstimationMessage(from.Id, user,message.Text);
+            var estimation = new EstimationMessage(user,message.Text);
             if (estimation.IsValid )
             {
                 return estimation;
@@ -24,24 +24,24 @@ namespace ScrumPokerBot.Telgram
                 switch (command[0].ToLower())
                 {
                     case "/startsession":
-                        return new StartSessionMessage(from.Id, user, message.Text);
+                        return new StartSessionMessage(user, message.Text);
                     case "/connect":
-                        var connectMessage =  new ConnectSessionMessage(from.Id, user, message.Text);
+                        var connectMessage =  new ConnectSessionMessage(user, message.Text);
                         if (connectMessage.IsValid )
                         {
                             return connectMessage;
                         }
-                        return new UnknownCommandMessage(from.Id, user, message.Text);
+                        return new UnknownCommandMessage(user, message.Text);
                     case "/poker":
-                        return new StartPokerMessage(from.Id, user, message.Text);
+                        return new StartPokerMessage(user, message.Text);
                     case "/leavesession":
-                        return new LeaveSessionMessage(from.Id, user, message.Text);
+                        return new LeaveSessionMessage(user, message.Text);
                     default:
-                        return new UnknownCommandMessage(from.Id, user, message.Text);
+                        return new UnknownCommandMessage(user, message.Text);
                 }
             }
             
-            return new UnknownCommandMessage(from.Id, user, message.Text);
+            return new UnknownCommandMessage(user, message.Text);
             
         }
     }

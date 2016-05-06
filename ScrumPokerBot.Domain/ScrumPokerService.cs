@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using ScrumPokerBot.Contracts;
@@ -8,122 +7,45 @@ namespace ScrumPokerBot.Domain
     public class ScrumPokerService : IScrumPokerService
     {
         private readonly IIdGenerator idGenerator;
-        private readonly IMessageReceiver messageReceiver;
         private readonly IMessageSender messageSender;
         private readonly List<RunningPoker> runningPokers = new List<RunningPoker>();
 
-        public ScrumPokerService(IMessageSender messageSender, IIdGenerator idGenerator,
-            IMessageReceiver messageReceiver)
+        public ScrumPokerService(IMessageSender messageSender, IIdGenerator idGenerator)
         {
             this.messageSender = messageSender;
             this.idGenerator = idGenerator;
-            this.messageReceiver = messageReceiver;
         }
 
         public List<ScrumPokerSession> ScrumPokerSessions { get; } = new List<ScrumPokerSession>();
 
-        public int StartNewSession(PokerUser user)
+        public void OnLeaveSessionMessageReceived(LeaveSessionMessage message)
         {
-            var existingSession = this.GetSession(user);
-            if (existingSession != null)
-            {
-                this.messageSender.UserAlreadyInSession(user);
-            }
-            var newSession = new ScrumPokerSession(user, idGenerator.GetId());
-            ScrumPokerSessions.Add(newSession);
-            messageSender.SendStartSessionToMaster(user, newSession.Id);
-            return newSession.Id;
+            LeaveSession(message.User);
         }
 
-        public void AddUserToSession(PokerUser user, int sessionId)
+        public void OnUnknownMessageReceived(UnknownCommandMessage e)
         {
-            var session = GetSession(sessionId);
-            if (session != null && session.AllUsers.All(u => u.Username != user.Username))
-            {
-                session.AddUser(user);
-                messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
-            }
-            if (session == null)
-            {
-                messageSender.NoSessionFound(user, sessionId);
-            }
+            messageSender.SendUnknownCommand(e);
         }
 
-        public void StartService()
+        public void OnStartSessionMessageReceived(StartSessionMessage e)
         {
-            messageReceiver.ConnectedMessageReceived += MessageReceiverOnConnectedMessageReceived;
-            messageReceiver.EstimationMessageReceived += MessageReceiverOnEstimationMessageReceived;
-            messageReceiver.StartPokerMessageReceived += MessageReceiverOnStartPokerMessageReceived;
-            messageReceiver.StartSessionMessageReceived += MessageReceiverOnStartSessionMessageReceived;
-            messageReceiver.UnknownMessageReceived += MessageReceiverOnUnknownMessageReceived;
-            messageReceiver.LeaveSessionMessageReceived += MessageReceiverOnLeaveSessionMessageReceived;
+            StartNewSession(e.User);
         }
 
-        private void MessageReceiverOnLeaveSessionMessageReceived(object sender, LeaveSessionEventArgs e)
+        public void OnStartPokerMessageReceived(StartPokerMessage startPokerMessage)
         {
-            this.LeaveSession(e.LeaveSessionMessage.User);
-        }
-
-        public void LeaveSession(PokerUser user)
-        {
-            var session = GetSession(user);
-            messageSender.SendUserLeaveSession(session.MasterUser, user);
-            session.RemoveUser(user);
-        }
-
-        public void StartPoker(int sessionId, string description, long requesterChatId)
-        {
-            var session = GetSession(sessionId);
-            if (runningPokers.Any(r => r.SessionId == sessionId))
-            {
-                messageSender.PokerAlreadyRunning(requesterChatId);
-            }
-
-            runningPokers.Add(new RunningPoker(session));
-            messageSender.SendPokerToUsers(session.AllUsers, description);
-        }
-
-        public void ShowResult(int sessionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EndPoker(int sessionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ScrumPokerSession GetSession(PokerUser user)
-        {
-            var session = ScrumPokerSessions.FirstOrDefault(s => s.AllUsers.Any(u => u.ChatId == user.ChatId));
-            return session;
-        }
-
-        private void MessageReceiverOnUnknownMessageReceived(object sender, UnknownCommandEventArgs e)
-        {
-            messageSender.SendUnknownCommand(e.UnknownCommandMessage);
-        }
-
-        private void MessageReceiverOnStartSessionMessageReceived(object sender, StartSessionEventArgs e)
-        {
-            StartNewSession(e.StartSessionMessage.User);
-        }
-
-        private void MessageReceiverOnStartPokerMessageReceived(object sender, StartPokerEventArgs e)
-        {
-            var startPokerMessage = e.StartPokerMessage;
             var session = GetSession(startPokerMessage.User);
             if (session == null)
             {
                 messageSender.NoSessionForUser(startPokerMessage.User);
                 return;
             }
-            StartPoker(session.Id, startPokerMessage.Description, startPokerMessage.ChatId);
+            StartPoker(session.Id, startPokerMessage.Description, startPokerMessage.User.ChatId);
         }
 
-        private void MessageReceiverOnEstimationMessageReceived(object sender, EstimationEventArgs e)
+        public void OnEstimationMessageReceived(EstimationMessage estimationMessage)
         {
-            var estimationMessage = e.EstimationMessage;
             var session = GetSession(estimationMessage.User);
             var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
             if (pokerSession == null)
@@ -140,11 +62,61 @@ namespace ScrumPokerBot.Domain
             ValidateEstimation(pokerSession, session);
         }
 
-        private void MessageReceiverOnConnectedMessageReceived(object sender,
-            ConnectEventArgs eventArgs)
+        public void OnConnectedMessageReceived(ConnectSessionMessage message)
         {
-            var connectSessionMessage = eventArgs.ConnectSessionMessage;
-            AddUserToSession(connectSessionMessage.User, connectSessionMessage.Sessionid);
+            AddUserToSession(message.User, message.Sessionid);
+        }
+
+        private int StartNewSession(PokerUser user)
+        {
+            var existingSession = GetSession(user);
+            if (existingSession != null)
+            {
+                messageSender.UserAlreadyInSession(user);
+            }
+            var newSession = new ScrumPokerSession(user, idGenerator.GetId());
+            ScrumPokerSessions.Add(newSession);
+            messageSender.SendStartSessionToMaster(user, newSession.Id);
+            return newSession.Id;
+        }
+
+        private void AddUserToSession(PokerUser user, int sessionId)
+        {
+            var session = GetSession(sessionId);
+            if (session != null && session.AllUsers.All(u => u.Username != user.Username))
+            {
+                session.AddUser(user);
+                messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
+            }
+            if (session == null)
+            {
+                messageSender.NoSessionFound(user, sessionId);
+            }
+        }
+
+        private void LeaveSession(PokerUser user)
+        {
+            var session = GetSession(user);
+            messageSender.SendUserLeaveSession(session.MasterUser, user);
+            session.RemoveUser(user);
+        }
+
+        private void StartPoker(int sessionId, string description, long requesterChatId)
+        {
+            var session = GetSession(sessionId);
+            if (runningPokers.Any(r => r.SessionId == sessionId))
+            {
+                messageSender.PokerAlreadyRunning(requesterChatId);
+            }
+
+            runningPokers.Add(new RunningPoker(session));
+            messageSender.SendPokerToUsers(session.AllUsers, description);
+        }
+
+        private ScrumPokerSession GetSession(PokerUser user)
+        {
+            var session = ScrumPokerSessions.FirstOrDefault(s => s.AllUsers.Any(u => u.ChatId == user.ChatId));
+            return session;
         }
 
         private void ValidateEstimation(RunningPoker pokerSession, ScrumPokerSession session)

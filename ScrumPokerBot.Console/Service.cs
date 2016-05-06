@@ -15,7 +15,6 @@ internal class Service : IService
     public void Start()
     {
         botService.Start();
-        scrumPokerService.StartService();
     }
 
     public void Stop()

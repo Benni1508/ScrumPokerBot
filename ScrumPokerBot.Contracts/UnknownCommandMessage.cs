@@ -2,7 +2,7 @@ namespace ScrumPokerBot.Contracts
 {
     public class UnknownCommandMessage : TelegramMessageBase
     {
-        public UnknownCommandMessage(long chatId, PokerUser user, string message) : base(chatId, user, message)
+        public UnknownCommandMessage(PokerUser user, string message) : base( user, message)
         {
         }
 

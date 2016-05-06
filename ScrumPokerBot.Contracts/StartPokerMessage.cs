@@ -4,8 +4,8 @@ namespace ScrumPokerBot.Contracts
 {
     public class StartPokerMessage : TelegramMessageBase
     {
-        public StartPokerMessage(long chatId, PokerUser user, string message)
-            : base(chatId, user, message)
+        public StartPokerMessage(PokerUser user, string message)
+            : base( user, message)
         {
             var regex = new Regex(regexPattern);
             if (regex.IsMatch(message))

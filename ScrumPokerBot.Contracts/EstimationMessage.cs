@@ -5,7 +5,7 @@ namespace ScrumPokerBot.Contracts
 {
     public class EstimationMessage : TelegramMessageBase
     {
-        public EstimationMessage(int id, PokerUser user, string text) : base(id, user, text)
+        public EstimationMessage(PokerUser user, string text) : base(user, text)
         {
             var regex = new Regex(RegexPattern);
             if (regex.IsMatch(text))

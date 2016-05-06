@@ -32,12 +32,7 @@ namespace ScrumPokerBot.Telgram
         {
         }
 
-        public event EventHandler<ConnectEventArgs> ConnectedMessageReceived;
-        public event EventHandler<EstimationEventArgs> EstimationMessageReceived;
-        public event EventHandler<StartSessionEventArgs> StartSessionMessageReceived;
-        public event EventHandler<StartPokerEventArgs> StartPokerMessageReceived;
-        public event EventHandler<UnknownCommandEventArgs> UnknownMessageReceived;
-        public event EventHandler<LeaveSessionEventArgs> LeaveSessionMessageReceived;
+        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
         private async Task Runner()
         {
@@ -70,64 +65,12 @@ namespace ScrumPokerBot.Telgram
 
         protected virtual void OnMessageReceived(ITelegramMessage e)
         {
-            if (e is ConnectSessionMessage)
-            {
-                OnConnectedMessageReceived(new ConnectEventArgs((ConnectSessionMessage) e));
-            }
-            else if (e is EstimationMessage)
-            {
-                OnEstimationMessageReceived(new EstimationEventArgs((EstimationMessage) e));
-            }
-            else if (e is StartSessionMessage)
-            {
-                OnStartSessionMessageReceived(new StartSessionEventArgs((StartSessionMessage) e));
-            }
-            else if (e is StartPokerMessage)
-            {
-                OnStartPokerMessageReceived(new StartPokerEventArgs((StartPokerMessage) e));
-            }
-            else if (e is UnknownCommandMessage)
-            {
-                OnUnknownMessageReceived(new UnknownCommandEventArgs((UnknownCommandMessage) e));
-            }
-            else if (e is LeaveSessionMessage)
-            {
-                OnLeaveSessionMessageReceived(new LeaveSessionEventArgs((LeaveSessionMessage) e));
-            }
-            else
-            {
-                throw new KeyNotFoundException();                
-            }
+            OnMessageReceived(new MessageReceivedEventArgs(e));
         }
 
-        protected virtual void OnEstimationMessageReceived(EstimationEventArgs e)
+        protected virtual void OnMessageReceived(MessageReceivedEventArgs e)
         {
-            EstimationMessageReceived?.Invoke(this, e);
-        }
-
-        protected virtual void OnStartSessionMessageReceived(StartSessionEventArgs e)
-        {
-            StartSessionMessageReceived?.Invoke(this, e);
-        }
-
-        protected virtual void OnStartPokerMessageReceived(StartPokerEventArgs e)
-        {
-            StartPokerMessageReceived?.Invoke(this, e);
-        }
-
-        protected virtual void OnUnknownMessageReceived(UnknownCommandEventArgs e)
-        {
-            UnknownMessageReceived?.Invoke(this, e);
-        }
-
-        protected virtual void OnConnectedMessageReceived(ConnectEventArgs e)
-        {
-            ConnectedMessageReceived?.Invoke(this, e);
-        }
-
-        protected virtual void OnLeaveSessionMessageReceived(LeaveSessionEventArgs e)
-        {
-            LeaveSessionMessageReceived?.Invoke(this, e);
+            MessageReceived?.Invoke(this, e);
         }
     }
 }
