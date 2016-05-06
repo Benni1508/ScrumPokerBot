@@ -61,6 +61,7 @@
     <Compile Include="MessageBus\MessageBus.cs" />
     <Compile Include="MessageBus\Subscription.cs" />
     <Compile Include="MessageHandler.cs" />
+    <Compile Include="MessageHandlers.cs" />
     <Compile Include="MessageSender.cs" />
     <Compile Include="RunningPoker.cs" />
     <Compile Include="ScrumPokerSession.cs" />

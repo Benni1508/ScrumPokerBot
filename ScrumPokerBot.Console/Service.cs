@@ -1,24 +1,27 @@
 using ScrumPokerBot.Domain;
 using ScrumPokerBot.Telgram;
 
-internal class Service : IService
+namespace ScrumPokerBot.Console
 {
-    private readonly IBotService botService;
-    private readonly IScrumPokerService scrumPokerService;
-
-    public Service(IBotService botService, IScrumPokerService scrumPokerService)
+    internal class Service : IService
     {
-        this.botService = botService;
-        this.scrumPokerService = scrumPokerService;
-    }
+        private readonly IBotService botService;
+        private readonly IScrumPokerService scrumPokerService;
 
-    public void Start()
-    {
-        botService.Start();
-    }
+        public Service(IBotService botService, IScrumPokerService scrumPokerService)
+        {
+            this.botService = botService;
+            this.scrumPokerService = scrumPokerService;
+        }
 
-    public void Stop()
-    {
-        botService.Stop();
+        public void Start()
+        {
+            botService.Start();
+        }
+
+        public void Stop()
+        {
+            botService.Stop();
+        }
     }
 }

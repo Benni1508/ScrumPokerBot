@@ -1,5 +1,8 @@
-internal interface IService
+namespace ScrumPokerBot.Console
 {
-    void Start();
-    void Stop();
+    internal interface IService
+    {
+        void Start();
+        void Stop();
+    }
 }

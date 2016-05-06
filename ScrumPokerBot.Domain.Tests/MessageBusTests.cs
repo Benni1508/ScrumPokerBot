@@ -1,5 +1,4 @@
 ﻿using System.Xml;
-using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.MessageBus;
 using Xunit;
 
@@ -18,20 +17,5 @@ namespace ScrumPokerBot.Domain.Tests
         }
             
 
-    }
-
-    public class HandlerTest1  : IHandle<TestMessage1>
-    {
-        public void Handle(TestMessage1 message)
-        {
-            
-        }
-    }
-
-    public interface ISuper : IMessage { }
-
-    public class TestMessage1 : IMessage
-    {
-        
     }
 }
