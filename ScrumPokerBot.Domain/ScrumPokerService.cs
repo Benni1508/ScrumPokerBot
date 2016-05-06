@@ -88,18 +88,19 @@ namespace ScrumPokerBot.Domain
             return session;
         }
 
-        private void MessageReceiverOnUnknownMessageReceived(object sender, UnknownCommandMessage unknownCommandMessage)
+        private void MessageReceiverOnUnknownMessageReceived(object sender, UnknownCommandEventArgs e)
         {
-            messageSender.SendUnknownCommand(unknownCommandMessage);
+            messageSender.SendUnknownCommand(e.UnknownCommandMessage);
         }
 
-        private void MessageReceiverOnStartSessionMessageReceived(object sender, StartSessionMessage startSessionMessage)
+        private void MessageReceiverOnStartSessionMessageReceived(object sender, StartSessionEventArgs e)
         {
-            StartNewSession(startSessionMessage.User);
+            StartNewSession(e.StartSessionMessage.User);
         }
 
-        private void MessageReceiverOnStartPokerMessageReceived(object sender, StartPokerMessage startPokerMessage)
+        private void MessageReceiverOnStartPokerMessageReceived(object sender, StartPokerEventArgs e)
         {
+            var startPokerMessage = e.StartPokerMessage;
             var session = GetSessionForUser(startPokerMessage.User);
             if (session == null)
             {
@@ -109,8 +110,9 @@ namespace ScrumPokerBot.Domain
             StartPoker(session.Id, startPokerMessage.Description, startPokerMessage.ChatId);
         }
 
-        private void MessageReceiverOnEstimationMessageReceived(object sender, EstimationMessage estimationMessage)
+        private void MessageReceiverOnEstimationMessageReceived(object sender, EstimationEventArgs e)
         {
+            var estimationMessage = e.EstimationMessage;
             var session = GetSessionForUser(estimationMessage.User);
             var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
             if (pokerSession == null)
@@ -128,7 +130,7 @@ namespace ScrumPokerBot.Domain
         }
 
         private void MessageReceiverOnConnectedMessageReceived(object sender,
-            ConnectMessageEventArgs eventArgs)
+            ConnectEventArgs eventArgs)
         {
             var connectSessionMessage = eventArgs.ConnectSessionMessage;
             AddUserToSession(connectSessionMessage.User, connectSessionMessage.Sessionid);

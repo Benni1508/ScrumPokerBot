@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ScrumPokerBot.Contracts;
@@ -31,11 +32,11 @@ namespace ScrumPokerBot.Telgram
         {
         }
 
-        public event EventHandler<ConnectMessageEventArgs> ConnectedMessageReceived;
-        public event EventHandler<EstimationMessage> EstimationMessageReceived;
-        public event EventHandler<StartSessionMessage> StartSessionMessageReceived;
-        public event EventHandler<StartPokerMessage> StartPokerMessageReceived;
-        public event EventHandler<UnknownCommandMessage> UnknownMessageReceived;
+        public event EventHandler<ConnectEventArgs> ConnectedMessageReceived;
+        public event EventHandler<EstimationEventArgs> EstimationMessageReceived;
+        public event EventHandler<StartSessionEventArgs> StartSessionMessageReceived;
+        public event EventHandler<StartPokerEventArgs> StartPokerMessageReceived;
+        public event EventHandler<UnknownCommandEventArgs> UnknownMessageReceived;
 
         private async Task Runner()
         {
@@ -70,24 +71,23 @@ namespace ScrumPokerBot.Telgram
         {
             if (e is ConnectSessionMessage)
             {
-
-                OnConnectedMessageReceived(new ConnectMessageEventArgs(e as ConnectSessionMessage));
+                OnConnectedMessageReceived(new ConnectEventArgs((ConnectSessionMessage) e));
             }
             else if (e is EstimationMessage)
             {
-                OnEstimationMessageReceived(e as EstimationMessage);
+                OnEstimationMessageReceived(new EstimationEventArgs((EstimationMessage) e));
             }
             else if (e is StartSessionMessage)
             {
-                OnStartSessionMessageReceived(e as StartSessionMessage);
+                OnStartSessionMessageReceived(new StartSessionEventArgs((StartSessionMessage) e));
             }
             else if (e is StartPokerMessage)
             {
-                OnStartPokerMessageReceived(e as StartPokerMessage);
+                OnStartPokerMessageReceived(new StartPokerEventArgs((StartPokerMessage) e));
             }
             else if (e is UnknownCommandMessage)
             {
-                OnUnknownMessageReceived(e as UnknownCommandMessage);
+                OnUnknownMessageReceived(new UnknownCommandEventArgs((UnknownCommandMessage) e));
             }
             else
             {
@@ -95,27 +95,27 @@ namespace ScrumPokerBot.Telgram
             }
         }
 
-        protected virtual void OnEstimationMessageReceived(EstimationMessage e)
+        protected virtual void OnEstimationMessageReceived(EstimationEventArgs e)
         {
             EstimationMessageReceived?.Invoke(this, e);
         }
 
-        protected virtual void OnStartSessionMessageReceived(StartSessionMessage e)
+        protected virtual void OnStartSessionMessageReceived(StartSessionEventArgs e)
         {
             StartSessionMessageReceived?.Invoke(this, e);
         }
 
-        protected virtual void OnStartPokerMessageReceived(StartPokerMessage e)
+        protected virtual void OnStartPokerMessageReceived(StartPokerEventArgs e)
         {
             StartPokerMessageReceived?.Invoke(this, e);
         }
 
-        protected virtual void OnUnknownMessageReceived(UnknownCommandMessage e)
+        protected virtual void OnUnknownMessageReceived(UnknownCommandEventArgs e)
         {
             UnknownMessageReceived?.Invoke(this, e);
         }
 
-        protected virtual void OnConnectedMessageReceived(ConnectMessageEventArgs e)
+        protected virtual void OnConnectedMessageReceived(ConnectEventArgs e)
         {
             ConnectedMessageReceived?.Invoke(this, e);
         }
