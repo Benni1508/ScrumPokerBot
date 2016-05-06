@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ScrumPokerBot.Contracts;
 
 namespace ScrumPokerBot.Domain
@@ -23,6 +24,15 @@ namespace ScrumPokerBot.Domain
         public void AddUser(PokerUser user)
         {
             users.Add(user);
+        }
+
+        public void RemoveUser(PokerUser user)
+        {
+            var foundUser = users.FirstOrDefault(u => u.ChatId == user.ChatId);
+            if (foundUser != null )
+            {
+                users.Remove(foundUser);
+            }
         }
     }
 }

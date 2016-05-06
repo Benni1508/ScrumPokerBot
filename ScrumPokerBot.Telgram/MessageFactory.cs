@@ -34,6 +34,8 @@ namespace ScrumPokerBot.Telgram
                         return new UnknownCommandMessage(from.Id, user, message.Text);
                     case "/poker":
                         return new StartPokerMessage(from.Id, user, message.Text);
+                    case "/leavesession":
+                        return new LeaveSessionMessage(from.Id, user, message.Text);
                     default:
                         return new UnknownCommandMessage(from.Id, user, message.Text);
                 }

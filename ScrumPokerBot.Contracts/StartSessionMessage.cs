@@ -6,10 +6,5 @@ namespace ScrumPokerBot.Contracts
         {
         }
 
-        public override CommandType CommandType
-        {
-            get { return CommandType.StartSession; }
-        }
-
     }
 }

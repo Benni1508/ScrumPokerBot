@@ -9,7 +9,6 @@ namespace ScrumPokerBot.Contracts
             Message = message;
         }
 
-        public abstract CommandType CommandType { get; }
         public long ChatId { get; }
         public PokerUser User { get; }
         public string Message { get; }

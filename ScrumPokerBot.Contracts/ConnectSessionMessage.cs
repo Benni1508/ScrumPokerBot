@@ -18,8 +18,6 @@ namespace ScrumPokerBot.Contracts
         }
 
         public int Sessionid { get; }
-        public override CommandType CommandType { get; }
-
         public bool IsValid { get; }
 
         private readonly string regexPattern = @"^\/connect (\d{1,3})$";

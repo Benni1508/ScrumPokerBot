@@ -17,7 +17,6 @@ namespace ScrumPokerBot.Contracts
         }
 
         public string Description { get; } = "";
-        public override CommandType CommandType => CommandType.StartPoker;
 
         private string regexPattern = @"^\/poker (.*)$";
     }

@@ -37,6 +37,7 @@ namespace ScrumPokerBot.Telgram
         public event EventHandler<StartSessionEventArgs> StartSessionMessageReceived;
         public event EventHandler<StartPokerEventArgs> StartPokerMessageReceived;
         public event EventHandler<UnknownCommandEventArgs> UnknownMessageReceived;
+        public event EventHandler<LeaveSessionEventArgs> LeaveSessionMessageReceived;
 
         private async Task Runner()
         {
@@ -44,7 +45,7 @@ namespace ScrumPokerBot.Telgram
             while (true)
             {
                 var updates = await bot.GetUpdates(offset);
-
+                Console.WriteLine($"{updates.Count()} Nachrichten gefunden");
                 if (firstRun)
                 {
                     offset = updates.Last().Id + 1;
@@ -89,6 +90,10 @@ namespace ScrumPokerBot.Telgram
             {
                 OnUnknownMessageReceived(new UnknownCommandEventArgs((UnknownCommandMessage) e));
             }
+            else if (e is LeaveSessionMessage)
+            {
+                OnLeaveSessionMessageReceived(new LeaveSessionEventArgs((LeaveSessionMessage) e));
+            }
             else
             {
                 throw new KeyNotFoundException();                
@@ -118,6 +123,11 @@ namespace ScrumPokerBot.Telgram
         protected virtual void OnConnectedMessageReceived(ConnectEventArgs e)
         {
             ConnectedMessageReceived?.Invoke(this, e);
+        }
+
+        protected virtual void OnLeaveSessionMessageReceived(LeaveSessionEventArgs e)
+        {
+            LeaveSessionMessageReceived?.Invoke(this, e);
         }
     }
 }

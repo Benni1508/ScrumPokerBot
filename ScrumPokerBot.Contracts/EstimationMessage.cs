@@ -22,7 +22,6 @@ namespace ScrumPokerBot.Contracts
         }
 
         public int Estimation { get; set; }
-        public override CommandType CommandType => CommandType.Estimation;
 
         public bool IsValid { get; }
 

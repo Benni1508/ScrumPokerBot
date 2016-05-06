@@ -7,12 +7,12 @@ namespace ScrumPokerBot.Domain
     {
         List<ScrumPokerSession> ScrumPokerSessions { get; }
         void StartService();
-        void EndSession(int sessionId);
+        void LeaveSession(PokerUser user);
         void ShowResult(int sessionId);
         void EndPoker(int sessionId);
         int StartNewSession(PokerUser user);
         void AddUserToSession(PokerUser user, int sessionId);
         void StartPoker(int sessionId, string description, long requesterChatId);
-        ScrumPokerSession GetSessionForUser(PokerUser user);
+        ScrumPokerSession GetSession(PokerUser user);
     }
 }

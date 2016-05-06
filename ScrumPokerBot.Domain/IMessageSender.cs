@@ -14,5 +14,7 @@ namespace ScrumPokerBot.Domain
         void SendPokerToUsers(PokerUser[] allUsers, string description);
         void SendPokerResult(ScrumPokerSession session, RunningPoker pokerSession);
         void NoPokerRunning(PokerUser user);
+        void UserAlreadyInSession(PokerUser user);
+        void SendUserLeaveSession(PokerUser masterUser, PokerUser user);
     }
 }

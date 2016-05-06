@@ -59,6 +59,7 @@
     <Compile Include="EstimationMessage.cs" />
     <Compile Include="IMessageReceiver.cs" />
     <Compile Include="ITelegramMessage.cs" />
+    <Compile Include="LeaveSessionMessage.cs" />
     <Compile Include="PokerUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultType.cs" />

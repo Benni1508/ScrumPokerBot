@@ -24,6 +24,11 @@ namespace ScrumPokerBot.Domain
 
         public int StartNewSession(PokerUser user)
         {
+            var existingSession = this.GetSession(user);
+            if (existingSession != null)
+            {
+                this.messageSender.UserAlreadyInSession(user);
+            }
             var newSession = new ScrumPokerSession(user, idGenerator.GetId());
             ScrumPokerSessions.Add(newSession);
             messageSender.SendStartSessionToMaster(user, newSession.Id);
@@ -51,13 +56,19 @@ namespace ScrumPokerBot.Domain
             messageReceiver.StartPokerMessageReceived += MessageReceiverOnStartPokerMessageReceived;
             messageReceiver.StartSessionMessageReceived += MessageReceiverOnStartSessionMessageReceived;
             messageReceiver.UnknownMessageReceived += MessageReceiverOnUnknownMessageReceived;
+            messageReceiver.LeaveSessionMessageReceived += MessageReceiverOnLeaveSessionMessageReceived;
         }
 
-        public void EndSession(int sessionId)
+        private void MessageReceiverOnLeaveSessionMessageReceived(object sender, LeaveSessionEventArgs e)
         {
-            var session = GetSession(sessionId);
-            messageSender.SendEndSession(session.AllUsers);
-            ScrumPokerSessions.Remove(session);
+            this.LeaveSession(e.LeaveSessionMessage.User);
+        }
+
+        public void LeaveSession(PokerUser user)
+        {
+            var session = GetSession(user);
+            messageSender.SendUserLeaveSession(session.MasterUser, user);
+            session.RemoveUser(user);
         }
 
         public void StartPoker(int sessionId, string description, long requesterChatId)
@@ -82,7 +93,7 @@ namespace ScrumPokerBot.Domain
             throw new NotImplementedException();
         }
 
-        public ScrumPokerSession GetSessionForUser(PokerUser user)
+        public ScrumPokerSession GetSession(PokerUser user)
         {
             var session = ScrumPokerSessions.FirstOrDefault(s => s.AllUsers.Any(u => u.ChatId == user.ChatId));
             return session;
@@ -101,7 +112,7 @@ namespace ScrumPokerBot.Domain
         private void MessageReceiverOnStartPokerMessageReceived(object sender, StartPokerEventArgs e)
         {
             var startPokerMessage = e.StartPokerMessage;
-            var session = GetSessionForUser(startPokerMessage.User);
+            var session = GetSession(startPokerMessage.User);
             if (session == null)
             {
                 messageSender.NoSessionForUser(startPokerMessage.User);
@@ -113,11 +124,11 @@ namespace ScrumPokerBot.Domain
         private void MessageReceiverOnEstimationMessageReceived(object sender, EstimationEventArgs e)
         {
             var estimationMessage = e.EstimationMessage;
-            var session = GetSessionForUser(estimationMessage.User);
+            var session = GetSession(estimationMessage.User);
             var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
             if (pokerSession == null)
             {
-                this.messageSender.NoPokerRunning(estimationMessage.User);
+                messageSender.NoPokerRunning(estimationMessage.User);
                 return;
             }
 

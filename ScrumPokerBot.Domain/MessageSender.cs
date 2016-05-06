@@ -92,6 +92,20 @@ namespace ScrumPokerBot.Domain
             bot.SendTextMessage(user.ChatId, text);
         }
 
+        public void UserAlreadyInSession(PokerUser user)
+        {
+            var text = "Du bist bereits in einer Session!";
+            bot.SendTextMessage(user.ChatId, text);
+        }
+
+        public void SendUserLeaveSession(PokerUser masterUser, PokerUser user)
+        {
+            var masterText = $"Der User {user.ToString()} hat die Session verlassen!";
+            var userText = "Du hast die Session verlassen";
+            bot.SendTextMessage(masterUser.ChatId, masterText);
+            bot.SendTextMessage(user.ChatId, userText);
+        }
+
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {
             var masterText = $"Der Benutzer {any.Lastname}, {any.Firstname} wurde der Session hinzugefügt.";

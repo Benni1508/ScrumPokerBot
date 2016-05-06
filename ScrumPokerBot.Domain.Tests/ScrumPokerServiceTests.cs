@@ -138,10 +138,12 @@ namespace ScrumPokerBot.Domain.Tests
         public void EndSession_ShouldInformUsers()
         {
             var result = service.StartNewSession(TestHelpers.GetTestUser(123));
-            service.EndSession(result);
+            service.AddUserToSession(TestHelpers.GetTestUser(2),result);
 
-            service.ScrumPokerSessions.Count.Should().Be(0);
-            messageSender.Received().SendEndSession(Arg.Any<PokerUser[]>());
+            service.LeaveSession(TestHelpers.GetTestUser(2));
+
+            service.ScrumPokerSessions.Count.Should().Be(1);
+            messageSender.Received().SendUserLeaveSession(Arg.Is<PokerUser>(u => u.ChatId == 123), Arg.Is<PokerUser>(u => u.ChatId== 2));
         }
 
         [Fact]
@@ -152,6 +154,16 @@ namespace ScrumPokerBot.Domain.Tests
             service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(2);
 
             messageSender.Received().InformaAddedUserAndMaster(Arg.Any<PokerUser>(), Arg.Any<PokerUser>());
+        }
+        [Fact]
+        public void StartTwoSessions()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+
+            service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(1);
+
+            messageSender.Received().UserAlreadyInSession(Arg.Any<PokerUser>());
         }
     }
 
