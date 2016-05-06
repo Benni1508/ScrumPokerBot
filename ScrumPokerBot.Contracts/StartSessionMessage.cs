@@ -10,5 +10,6 @@ namespace ScrumPokerBot.Contracts
         {
             get { return CommandType.StartSession; }
         }
+
     }
 }

@@ -1,14 +1,24 @@
+using System.Text.RegularExpressions;
+
 namespace ScrumPokerBot.Contracts
 {
     public class StartPokerMessage : TelegramMessageBase
     {
-        public StartPokerMessage(long chatId, PokerUser user, string message, string description)
+        public StartPokerMessage(long chatId, PokerUser user, string message)
             : base(chatId, user, message)
         {
-            Description = description;
+            var regex = new Regex(regexPattern);
+            if (regex.IsMatch(message))
+            {
+                var match = regex.Match(message);
+                var group = match.Groups[1];
+                Description = group.Value;
+            }
         }
 
-        public string Description { get; }
+        public string Description { get; } = "";
         public override CommandType CommandType => CommandType.StartPoker;
+
+        private string regexPattern = @"^\/poker (.*)$";
     }
 }

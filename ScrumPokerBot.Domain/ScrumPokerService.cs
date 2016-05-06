@@ -116,7 +116,9 @@ namespace ScrumPokerBot.Domain
             if (pokerSession == null)
             {
                 this.messageSender.NoPokerRunning(estimationMessage.User);
+                return;
             }
+
             var userEstimation = pokerSession.Users.FirstOrDefault(ue => ue.UserId == estimationMessage.User.ChatId);
             if (userEstimation != null && !userEstimation.EstimationReceived)
             {
@@ -126,8 +128,9 @@ namespace ScrumPokerBot.Domain
         }
 
         private void MessageReceiverOnConnectedMessageReceived(object sender,
-            ConnectSessionMessage connectSessionMessage)
+            ConnectMessageEventArgs eventArgs)
         {
+            var connectSessionMessage = eventArgs.ConnectSessionMessage;
             AddUserToSession(connectSessionMessage.User, connectSessionMessage.Sessionid);
         }
 

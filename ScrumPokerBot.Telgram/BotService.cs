@@ -31,7 +31,7 @@ namespace ScrumPokerBot.Telgram
         {
         }
 
-        public event EventHandler<ConnectSessionMessage> ConnectedMessageReceived;
+        public event EventHandler<ConnectMessageEventArgs> ConnectedMessageReceived;
         public event EventHandler<EstimationMessage> EstimationMessageReceived;
         public event EventHandler<StartSessionMessage> StartSessionMessageReceived;
         public event EventHandler<StartPokerMessage> StartPokerMessageReceived;
@@ -70,7 +70,8 @@ namespace ScrumPokerBot.Telgram
         {
             if (e is ConnectSessionMessage)
             {
-                OnConnectedMessageReceived(e as ConnectSessionMessage);
+
+                OnConnectedMessageReceived(new ConnectMessageEventArgs(e as ConnectSessionMessage));
             }
             else if (e is EstimationMessage)
             {
@@ -114,7 +115,7 @@ namespace ScrumPokerBot.Telgram
             UnknownMessageReceived?.Invoke(this, e);
         }
 
-        protected virtual void OnConnectedMessageReceived(ConnectSessionMessage e)
+        protected virtual void OnConnectedMessageReceived(ConnectMessageEventArgs e)
         {
             ConnectedMessageReceived?.Invoke(this, e);
         }

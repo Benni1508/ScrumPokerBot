@@ -1,14 +1,27 @@
+using System.Text.RegularExpressions;
+
 namespace ScrumPokerBot.Contracts
 {
     public class ConnectSessionMessage : TelegramMessageBase
     {
-        public ConnectSessionMessage(long chatId, PokerUser user, string message, int sessionid)
+        public ConnectSessionMessage(long chatId, PokerUser user, string message)
             : base(chatId, user, message)
         {
-            Sessionid = sessionid;
+            var regex = new Regex(regexPattern);
+            if (!regex.IsMatch(message)) return;
+
+            var matches = regex.Match(message);
+            var x = matches.Groups[1];
+            int value;
+            this.IsValid = int.TryParse(x.Value, out value);
+            this.Sessionid = value;
         }
 
         public int Sessionid { get; }
         public override CommandType CommandType { get; }
+
+        public bool IsValid { get; }
+
+        private readonly string regexPattern = @"^\/connect (\d{1,3})$";
     }
 }

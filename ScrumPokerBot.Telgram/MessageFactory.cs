@@ -5,21 +5,19 @@ using Telegram.Bot.Types;
 
 namespace ScrumPokerBot.Telgram
 {
-    internal class MessageFactory : IMessageFactory
+    public class MessageFactory : IMessageFactory
     {
         public ITelegramMessage Create(Message message)
         {
-            int value;
             var from = message.From;
             var user = new PokerUser(message.Chat);
 
-            var regex = new Regex("^(\\d*) Story Points$");
-            var matches = regex.Match(message.Text);
-            if (matches.Success)
+            var estimation = new EstimationMessage(from.Id, user,message.Text);
+            if (estimation.IsValid )
             {
-                return new EstimationMessage(from.Id, user, message.Text, int.Parse(matches.Groups[1].Value));
+                return estimation;
             }
-
+         
             if (message.Text.StartsWith("/"))
             {
                 var command = message.Text.Split(' ');
@@ -28,28 +26,21 @@ namespace ScrumPokerBot.Telgram
                     case "/startsession":
                         return new StartSessionMessage(from.Id, user, message.Text);
                     case "/connect":
-                        int sessionid;
-                        if (int.TryParse(command[1], out sessionid))
+                        var connectMessage =  new ConnectSessionMessage(from.Id, user, message.Text);
+                        if (connectMessage.IsValid )
                         {
-                            return new ConnectSessionMessage(from.Id, user, message.Text, sessionid);
+                            return connectMessage;
                         }
                         return new UnknownCommandMessage(from.Id, user, message.Text);
                     case "/poker":
-                        var desc = "";
-                        if (command.Count() > 1)
-                        {
-                            desc = string.Join(" ", command.Skip(1).ToArray());
-                        }
-                        return new StartPokerMessage(from.Id, user, message.Text, desc);
+                        return new StartPokerMessage(from.Id, user, message.Text);
                     default:
                         return new UnknownCommandMessage(from.Id, user, message.Text);
                 }
             }
-            if (!message.Text.StartsWith("/") && !int.TryParse(message.Text, out value))
-            {
-                return new UnknownCommandMessage(from.Id, user, message.Text);
-            }
-            return null;
+            
+            return new UnknownCommandMessage(from.Id, user, message.Text);
+            
         }
     }
 }
