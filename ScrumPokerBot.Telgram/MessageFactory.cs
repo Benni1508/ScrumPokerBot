@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ScrumPokerBot.Contracts;
@@ -8,7 +9,14 @@ namespace ScrumPokerBot.Telgram
 {
     public class MessageFactory : IMessageFactory
     {
-        public ITelegramMessage Create(Message message)
+        private readonly IMessageBus bus;
+
+        public MessageFactory(IMessageBus bus)
+        {
+            this.bus = bus;
+        }
+
+        public void PublishMessage(Message message)
         {
             var from = message.From;
             var user = new PokerUser(message.Chat);
@@ -16,7 +24,7 @@ namespace ScrumPokerBot.Telgram
             var estimation = new EstimationMessage(user,message.Text);
             if (estimation.IsValid )
             {
-                return estimation;
+                bus.Publish(estimation);
             }
          
             if (message.Text.StartsWith("/"))
@@ -25,24 +33,30 @@ namespace ScrumPokerBot.Telgram
                 switch (command[0].ToLower())
                 {
                     case "/startsession":
-                        return new StartSessionMessage(user, message.Text);
+                        bus.Publish(new StartSessionMessage(user, message.Text));
+                        break;
                     case "/connect":
                         var connectMessage =  new ConnectSessionMessage(user, message.Text);
                         if (connectMessage.IsValid )
                         {
-                            return connectMessage;
+                            bus.Publish(connectMessage);
+                            break;
                         }
-                        return new UnknownCommandMessage(user, message.Text);
+                        bus.Publish(new UnknownCommandMessage(user, message.Text));
+                        break;
                     case "/poker":
-                        return new StartPokerMessage(user, message.Text);
+                        bus.Publish(new StartPokerMessage(user, message.Text));
+                        break;
                     case "/leavesession":
-                        return new LeaveSessionMessage(user, message.Text);
+                        bus.Publish(new LeaveSessionMessage(user, message.Text));
+                        break;
                     default:
-                        return new UnknownCommandMessage(user, message.Text);
+                        bus.Publish(new UnknownCommandMessage(user, message.Text));
+                        break;
                 }
             }
             
-            return new UnknownCommandMessage(user, message.Text);
+         bus.Publish(new UnknownCommandMessage(user, message.Text));
             
         }
     }

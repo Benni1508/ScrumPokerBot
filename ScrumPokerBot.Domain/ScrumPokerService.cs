@@ -19,13 +19,6 @@ namespace ScrumPokerBot.Domain
 
         public List<ScrumPokerSession> ScrumPokerSessions { get; } = new List<ScrumPokerSession>();
 
-
-        public void OnUnknownMessageReceived(UnknownCommandMessage e)
-        {
-            messageSender.SendUnknownCommand(e);
-        }
-
-
         public int StartNewSession(PokerUser user)
         {
             var existingSession = GetSession(user);
@@ -116,20 +109,23 @@ namespace ScrumPokerBot.Domain
     }
 
     public class MessageHandlers : IHandle<StartSessionMessage>, IHandle<ConnectSessionMessage>,
-        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>
+        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>, IHandle<UnknownCommandMessage>
     {
         private readonly IScrumPokerService service;
         private readonly IMessageBus bus;
+        private readonly IMessageSender messageSender;
 
-        public MessageHandlers(IScrumPokerService service, IMessageBus bus)
+        public MessageHandlers(IScrumPokerService service, IMessageBus bus, IMessageSender messageSender)
         {
             this.service = service;
             this.bus = bus;
+            this.messageSender = messageSender;
             bus.Subscribe<StartSessionMessage>(this);
             bus.Subscribe<ConnectSessionMessage>(this);
             bus.Subscribe<StartPokerMessage>(this);
             bus.Subscribe<EstimationMessage>(this);
             bus.Subscribe<LeaveSessionMessage>(this);
+            bus.Subscribe<UnknownCommandMessage>(this);
         }
 
         public void Handle(StartSessionMessage message)
@@ -159,5 +155,9 @@ namespace ScrumPokerBot.Domain
             service.LeaveSession(message.User);
         }
 
+        public void Handle(UnknownCommandMessage message)
+        {
+            this.messageSender.SendUnknownCommand(message);
+        }
     }
 }

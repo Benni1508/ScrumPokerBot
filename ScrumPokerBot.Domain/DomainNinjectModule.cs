@@ -1,4 +1,5 @@
-﻿using Ninject.Modules;
+﻿using Ninject;
+using Ninject.Modules;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.MessageBus;
 
@@ -12,6 +13,11 @@ namespace ScrumPokerBot.Domain
             Bind<IMessageSender>().To<MessageSender>();
             Bind<IIdGenerator>().To<IdGenerator>();
             Bind<IMessageBus>().To<MessageBus.MessageBus>().InSingletonScope();
+
+            Bind<MessageHandlers>().ToSelf();
+
+            
+            this.Kernel.Get<MessageHandlers>();
         }
     }
 }

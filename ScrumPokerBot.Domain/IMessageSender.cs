@@ -8,7 +8,7 @@ namespace ScrumPokerBot.Domain
         void SendEndSession(PokerUser[] allUsers);
         void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser);
         void SendStartSessionToMaster(PokerUser user, int sessionId);
-        void SendUnknownCommand(ITelegramMessage message);
+        void SendUnknownCommand(UnknownCommandMessage message);
         void NoSessionFound(PokerUser user, int sessionId);
         void NoSessionForUser(PokerUser user);
         void PokerAlreadyRunning(long requesterChatId);

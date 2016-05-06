@@ -6,6 +6,6 @@ namespace ScrumPokerBot.Telgram
 {
     public interface IMessageFactory
     {
-        ITelegramMessage Create(Message message);
+        void PublishMessage(Message message);
     }
 }

@@ -61,7 +61,6 @@
     <Compile Include="IMessage.cs" />
     <Compile Include="Messages\ITelegramMessage.cs" />
     <Compile Include="Messages\LeaveSessionMessage.cs" />
-    <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="PokerUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultType.cs" />
