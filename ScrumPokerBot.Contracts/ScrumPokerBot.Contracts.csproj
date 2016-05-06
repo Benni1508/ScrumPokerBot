@@ -53,23 +53,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandType.cs" />
-    <Compile Include="ConnectEventArgs.cs" />
-    <Compile Include="ConnectSessionMessage.cs" />
-    <Compile Include="EstimationEventArgs.cs" />
-    <Compile Include="EstimationMessage.cs" />
-    <Compile Include="IMessageReceiver.cs" />
-    <Compile Include="ITelegramMessage.cs" />
-    <Compile Include="LeaveSessionMessage.cs" />
+    <Compile Include="IHandle.cs" />
+    <Compile Include="IMessageBus.cs" />
+    <Compile Include="ISubscription.cs" />
+    <Compile Include="Messages\ConnectSessionMessage.cs" />
+    <Compile Include="Messages\EstimationMessage.cs" />
+    <Compile Include="IMessage.cs" />
+    <Compile Include="Messages\ITelegramMessage.cs" />
+    <Compile Include="Messages\LeaveSessionMessage.cs" />
+    <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="PokerUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultType.cs" />
-    <Compile Include="StartPokerEventArgs.cs" />
-    <Compile Include="StartPokerMessage.cs" />
-    <Compile Include="StartSessionEventArgs.cs" />
-    <Compile Include="StartSessionMessage.cs" />
+    <Compile Include="Messages\StartPokerMessage.cs" />
+    <Compile Include="Messages\StartSessionMessage.cs" />
     <Compile Include="TelegramMessageBase.cs" />
-    <Compile Include="UnknownCommandEventArgs.cs" />
-    <Compile Include="UnknownCommandMessage.cs" />
+    <Compile Include="Messages\UnknownCommandMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

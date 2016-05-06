@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Ninject.Modules;
-using ScrumPokerBot.Domain;
+using ScrumPokerBot.Contracts;
 using Telegram.Bot;
 
 namespace ScrumPokerBot.Telgram
@@ -11,7 +11,7 @@ namespace ScrumPokerBot.Telgram
         {
             var apikey = File.ReadAllText("C:\\Temp\\ApiKey.txt");
             Bind<Api>().ToConstant(new Api(apikey)).InSingletonScope();
-            Bind<IBotService, IMessageReceiver>().To<BotService>().InSingletonScope();
+            Bind<IBotService>().To<BotService>().InSingletonScope();
             Bind<IMessageFactory>().To<MessageFactory>();
         }
     }

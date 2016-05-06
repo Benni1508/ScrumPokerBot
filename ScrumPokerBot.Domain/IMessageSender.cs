@@ -1,4 +1,5 @@
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Contracts.Messages;
 
 namespace ScrumPokerBot.Domain
 {

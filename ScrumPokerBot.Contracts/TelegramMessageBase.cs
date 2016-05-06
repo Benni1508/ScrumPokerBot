@@ -1,3 +1,5 @@
+using ScrumPokerBot.Contracts.Messages;
+
 namespace ScrumPokerBot.Contracts
 {
     public abstract class TelegramMessageBase : ITelegramMessage

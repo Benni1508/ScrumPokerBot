@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NSubstitute;
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Contracts.Messages;
 using ScrumPokerBot.Telgram;
 using Telegram.Bot.Types;
 using Xunit;
@@ -96,7 +97,6 @@ namespace ScrumPokerBot.Domain.Tests
 
     public class ScrumPokerServiceTests
     {
-        private readonly IMessageReceiver messageReceiver;
         private readonly IMessageSender messageSender;
         private readonly ScrumPokerService service;
 
@@ -104,7 +104,6 @@ namespace ScrumPokerBot.Domain.Tests
         {
             messageSender = Substitute.For<IMessageSender>();
             var idGenerator = Substitute.For<IIdGenerator>();
-            messageReceiver = Substitute.For<IMessageReceiver>();
             idGenerator.GetId().Returns(12);
             service = new ScrumPokerService(messageSender, idGenerator);
         }
@@ -112,44 +111,33 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void StartNewSession_ShouldReturnsSessionid()
         {
-            service.OnStartSessionMessageReceived(GetStartSession(123));
+            service.StartNewSession(TestHelpers.GetTestUser(123));
             service.ScrumPokerSessions.Count.Should().Be(1);
             service.ScrumPokerSessions.First().MasterUser.ChatId.Should().Be(123);
-        }
-
-        private StartSessionMessage GetStartSession(int userChat)
-        {
-            return new StartSessionMessage(TestHelpers.GetTestUser(userChat), "/Startsession");
-        }
-
-        private ConnectSessionMessage GetConnectSession(int userChat, int id)
-        {
-            return new ConnectSessionMessage(TestHelpers.GetTestUser(userChat), $"/Connect {id}");
         }
 
         [Fact]
         public void ConnectWithWrongId_InformsUser()
         {
-            var message = GetConnectSession(1, 1);
-            service.OnConnectedMessageReceived(message);
+            service.ConnectToSession(TestHelpers.GetTestUser(1), 1);
             messageSender.Received().NoSessionFound(Arg.Any<PokerUser>(), 1);
         }
 
         [Fact]
         public void Test1()
         {
-            service.OnStartSessionMessageReceived(GetStartSession(1));
-            service.OnConnectedMessageReceived(GetConnectSession(2,12));
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
             messageSender.Received().InformaAddedUserAndMaster(Arg.Is<PokerUser>(p => p.ChatId == 2), Arg.Is<PokerUser>(p => p.ChatId == 1));
         }
 
         [Fact]
         public void EndSession_ShouldInformUsers()
         {
-            service.OnStartSessionMessageReceived(GetStartSession(123));
-            service.OnConnectedMessageReceived(GetConnectSession(2,12));
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
 
-            service.OnLeaveSessionMessageReceived(new LeaveSessionMessage(TestHelpers.GetTestUser(2),"/leaveSession"));
+            service.LeaveSession(TestHelpers.GetTestUser(2));
 
             service.ScrumPokerSessions.Count.Should().Be(1);
             messageSender.Received().SendUserLeaveSession(Arg.Is<PokerUser>(u => u.ChatId == 123), Arg.Is<PokerUser>(u => u.ChatId== 2));
@@ -158,8 +146,8 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void AddUserToRunningSession()
         {
-            service.OnStartSessionMessageReceived(GetStartSession(123));
-            service.OnConnectedMessageReceived(GetConnectSession(2,12));;
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
             service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(2);
 
             messageSender.Received().InformaAddedUserAndMaster(Arg.Any<PokerUser>(), Arg.Any<PokerUser>());
@@ -167,8 +155,8 @@ namespace ScrumPokerBot.Domain.Tests
         [Fact]
         public void StartTwoSessions()
         {
-            service.OnStartSessionMessageReceived(GetStartSession(123));
-            service.OnStartSessionMessageReceived(GetStartSession(123));
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.StartNewSession(TestHelpers.GetTestUser(123));
 
             service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(1);
 

@@ -4,23 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ScrumPokerBot.Contracts;
-using ScrumPokerBot.Domain;
+using ScrumPokerBot.Contracts.Messages;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace ScrumPokerBot.Telgram
 {
-    public class BotService : IBotService, IMessageReceiver
+    public class BotService : IBotService
     {
         private readonly Api bot;
         private readonly IMessageFactory messageFactory;
+        private readonly IMessageBus bus;
         private bool firstRun;
 
-        public BotService(Api bot, IMessageFactory messageFactory)
+        public BotService(Api bot, IMessageFactory messageFactory, IMessageBus bus)
         {
             firstRun = true;
             this.bot = bot;
             this.messageFactory = messageFactory;
+            this.bus = bus;
         }
 
         public void Start()
@@ -32,7 +34,6 @@ namespace ScrumPokerBot.Telgram
         {
         }
 
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
         private async Task Runner()
         {
@@ -55,7 +56,7 @@ namespace ScrumPokerBot.Telgram
                     if (update.Message != null && update.Message.Type == MessageType.TextMessage)
                     {
                         var message = messageFactory.Create(update.Message);
-                        OnMessageReceived(message);
+                        bus.Publish(message);
                     }
                 }
 
@@ -63,14 +64,5 @@ namespace ScrumPokerBot.Telgram
             }
         }
 
-        protected virtual void OnMessageReceived(ITelegramMessage e)
-        {
-            OnMessageReceived(new MessageReceivedEventArgs(e));
-        }
-
-        protected virtual void OnMessageReceived(MessageReceivedEventArgs e)
-        {
-            MessageReceived?.Invoke(this, e);
-        }
     }
 }

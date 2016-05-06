@@ -1,16 +1,17 @@
 using System.Collections.Generic;
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Contracts.Messages;
 
 namespace ScrumPokerBot.Domain
 {
     public interface IScrumPokerService
     {
         List<ScrumPokerSession> ScrumPokerSessions { get; }
-        void OnConnectedMessageReceived(ConnectSessionMessage message);
-        void OnStartPokerMessageReceived(StartPokerMessage startPokerMessage);
-        void OnStartSessionMessageReceived(StartSessionMessage e);
         void OnUnknownMessageReceived(UnknownCommandMessage e);
-        void OnEstimationMessageReceived(EstimationMessage estimationMessage);
-        void OnLeaveSessionMessageReceived(LeaveSessionMessage e);
+        int StartNewSession(PokerUser user);
+        void ConnectToSession(PokerUser user, int sessionId);
+        void StartPoker(PokerUser user, string description, long requesterChatId);
+        void LeaveSession(PokerUser user);
+        void Estimate(PokerUser user, int estimation);
     }
 }

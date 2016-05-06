@@ -94,6 +94,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="MessageBusTests.cs" />
     <Compile Include="ScrumPokerServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

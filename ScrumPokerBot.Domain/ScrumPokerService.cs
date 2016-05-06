@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Contracts.Messages;
 
 namespace ScrumPokerBot.Domain
 {
@@ -18,56 +19,14 @@ namespace ScrumPokerBot.Domain
 
         public List<ScrumPokerSession> ScrumPokerSessions { get; } = new List<ScrumPokerSession>();
 
-        public void OnLeaveSessionMessageReceived(LeaveSessionMessage message)
-        {
-            LeaveSession(message.User);
-        }
 
         public void OnUnknownMessageReceived(UnknownCommandMessage e)
         {
             messageSender.SendUnknownCommand(e);
         }
 
-        public void OnStartSessionMessageReceived(StartSessionMessage e)
-        {
-            StartNewSession(e.User);
-        }
 
-        public void OnStartPokerMessageReceived(StartPokerMessage startPokerMessage)
-        {
-            var session = GetSession(startPokerMessage.User);
-            if (session == null)
-            {
-                messageSender.NoSessionForUser(startPokerMessage.User);
-                return;
-            }
-            StartPoker(session.Id, startPokerMessage.Description, startPokerMessage.User.ChatId);
-        }
-
-        public void OnEstimationMessageReceived(EstimationMessage estimationMessage)
-        {
-            var session = GetSession(estimationMessage.User);
-            var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
-            if (pokerSession == null)
-            {
-                messageSender.NoPokerRunning(estimationMessage.User);
-                return;
-            }
-
-            var userEstimation = pokerSession.Users.FirstOrDefault(ue => ue.UserId == estimationMessage.User.ChatId);
-            if (userEstimation != null && !userEstimation.EstimationReceived)
-            {
-                userEstimation.SetEstimation(estimationMessage.Estimation);
-            }
-            ValidateEstimation(pokerSession, session);
-        }
-
-        public void OnConnectedMessageReceived(ConnectSessionMessage message)
-        {
-            AddUserToSession(message.User, message.Sessionid);
-        }
-
-        private int StartNewSession(PokerUser user)
+        public int StartNewSession(PokerUser user)
         {
             var existingSession = GetSession(user);
             if (existingSession != null)
@@ -80,7 +39,7 @@ namespace ScrumPokerBot.Domain
             return newSession.Id;
         }
 
-        private void AddUserToSession(PokerUser user, int sessionId)
+        public void ConnectToSession(PokerUser user, int sessionId)
         {
             var session = GetSession(sessionId);
             if (session != null && session.AllUsers.All(u => u.Username != user.Username))
@@ -94,17 +53,22 @@ namespace ScrumPokerBot.Domain
             }
         }
 
-        private void LeaveSession(PokerUser user)
+        public void LeaveSession(PokerUser user)
         {
             var session = GetSession(user);
             messageSender.SendUserLeaveSession(session.MasterUser, user);
             session.RemoveUser(user);
         }
 
-        private void StartPoker(int sessionId, string description, long requesterChatId)
+        public void StartPoker(PokerUser user, string description, long requesterChatId)
         {
-            var session = GetSession(sessionId);
-            if (runningPokers.Any(r => r.SessionId == sessionId))
+            var session = GetSession(user);
+            if (session == null)
+            {
+                messageSender.NoSessionForUser(user);
+                return;
+            }
+            if (runningPokers.Any(r => r.SessionId == session.Id))
             {
                 messageSender.PokerAlreadyRunning(requesterChatId);
             }
@@ -131,5 +95,69 @@ namespace ScrumPokerBot.Domain
         {
             return ScrumPokerSessions.SingleOrDefault(s => s.Id == sessionId);
         }
+
+        public void Estimate(PokerUser user, int estimation)
+        {
+            var session = GetSession(user);
+            var pokerSession = runningPokers.FirstOrDefault(p => p.SessionId == session.Id);
+            if (pokerSession == null)
+            {
+                messageSender.NoPokerRunning(user);
+                return;
+            }
+
+            var userEstimation = pokerSession.Users.FirstOrDefault(ue => ue.UserId == user.ChatId);
+            if (userEstimation != null && !userEstimation.EstimationReceived)
+            {
+                userEstimation.SetEstimation(estimation);
+            }
+            ValidateEstimation(pokerSession, session);
+        }
+    }
+
+    public class MessageHandlers : IHandle<StartSessionMessage>, IHandle<ConnectSessionMessage>,
+        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>
+    {
+        private readonly IScrumPokerService service;
+        private readonly IMessageBus bus;
+
+        public MessageHandlers(IScrumPokerService service, IMessageBus bus)
+        {
+            this.service = service;
+            this.bus = bus;
+            bus.Subscribe<StartSessionMessage>(this);
+            bus.Subscribe<ConnectSessionMessage>(this);
+            bus.Subscribe<StartPokerMessage>(this);
+            bus.Subscribe<EstimationMessage>(this);
+            bus.Subscribe<LeaveSessionMessage>(this);
+        }
+
+        public void Handle(StartSessionMessage message)
+        {
+            service.StartNewSession(message.User);
+        }
+
+        public void Handle(ConnectSessionMessage message)
+        {
+            service.ConnectToSession(message.User, message.Sessionid);
+        }
+
+        public void Handle(StartPokerMessage message)
+        {
+
+            service.StartPoker(message.User, message.Description, message.User.ChatId);
+        }
+
+        public void Handle(EstimationMessage message)
+        {
+            service.Estimate(message.User, message.Estimation);
+        }
+
+
+        public void Handle(LeaveSessionMessage message)
+        {
+            service.LeaveSession(message.User);
+        }
+
     }
 }

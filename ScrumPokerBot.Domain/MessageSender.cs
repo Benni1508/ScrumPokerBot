@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text;
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Contracts.Messages;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
