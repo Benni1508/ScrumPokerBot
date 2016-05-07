@@ -63,14 +63,14 @@
     <Compile Include="MessageHandler.cs" />
     <Compile Include="MessageHandlers.cs" />
     <Compile Include="MessageSender.cs" />
-    <Compile Include="RunningPoker.cs" />
-    <Compile Include="ScrumPokerSession.cs" />
-    <Compile Include="IIdGenerator.cs" />
-    <Compile Include="IMessageSender.cs" />
-    <Compile Include="IScrumPokerService.cs" />
+    <Compile Include="Dtos\RunningPoker.cs" />
+    <Compile Include="Dtos\ScrumPokerSession.cs" />
+    <Compile Include="Interfaces\IIdGenerator.cs" />
+    <Compile Include="Interfaces\IMessageSender.cs" />
+    <Compile Include="Interfaces\IScrumPokerService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScrumPokerService.cs" />
-    <Compile Include="UserEstimation.cs" />
+    <Compile Include="Dtos\UserEstimation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

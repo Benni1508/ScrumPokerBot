@@ -3,6 +3,8 @@ using System.Linq;
 using System.Text;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Contracts.Messages;
+using ScrumPokerBot.Domain.Dtos;
+using ScrumPokerBot.Domain.Interfaces;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Domain.Dtos;
+using ScrumPokerBot.Domain.Interfaces;
 
 namespace ScrumPokerBot.Domain
 {
@@ -99,10 +101,12 @@ namespace ScrumPokerBot.Domain
             {
                 messageSender.EstimationAlreadyCounted(user);
             }
+
             if (!session.Estimate(user, estimation)) return;
 
             messageSender.SendPokerResult(session, session.Poker.ToString());
             session.ClearPoker();
+
         }
 
         public void ShowAllUsers(PokerUser user)

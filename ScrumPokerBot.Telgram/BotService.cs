@@ -48,7 +48,7 @@ namespace ScrumPokerBot.Telgram
                             continue;
                         }
                         offset = updates.Last().Id + 1;
-                        Console.WriteLine($"Skip {offset} Messages!");
+                        Console.WriteLine($"Skip {updates.Count()} Messages!");
                         firstRun = false;
                         continue;
                     }

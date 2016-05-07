@@ -1,4 +1,5 @@
 using System;
+using ScrumPokerBot.Domain.Interfaces;
 
 namespace ScrumPokerBot.Domain
 {

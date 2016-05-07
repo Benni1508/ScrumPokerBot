@@ -6,6 +6,8 @@ using FluentAssertions;
 using Microsoft.Win32;
 using NSubstitute;
 using ScrumPokerBot.Contracts;
+using ScrumPokerBot.Domain.Dtos;
+using ScrumPokerBot.Domain.Interfaces;
 using ScrumPokerBot.Telgram;
 using Telegram.Bot.Types;
 using Xunit;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ScrumPokerBot.Domain.Dtos;
 using Xunit;
 
 namespace ScrumPokerBot.Domain.Tests

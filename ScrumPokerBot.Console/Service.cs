@@ -1,4 +1,5 @@
 using ScrumPokerBot.Domain;
+using ScrumPokerBot.Domain.Interfaces;
 using ScrumPokerBot.Telgram;
 
 namespace ScrumPokerBot.Console

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
+using ScrumPokerBot.Domain.Interfaces;
 using Xunit;
 
 namespace ScrumPokerBot.Domain.Tests
