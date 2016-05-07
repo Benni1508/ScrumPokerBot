@@ -1,5 +1,5 @@
+using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using ScrumPokerBot.Contracts;
@@ -15,10 +15,11 @@ namespace ScrumPokerBot.Domain
         {
             this.messageSender = messageSender;
             this.idGenerator = idGenerator;
-            ScrumPokerSessions = new MyList();;
+            ScrumPokerSessions = new MyList<ScrumPokerSession>();
+            ;
         }
 
-        public MyList ScrumPokerSessions { get; }
+        public MyList<ScrumPokerSession> ScrumPokerSessions { get; }
 
         public int StartNewSession(PokerUser user)
         {
@@ -35,15 +36,21 @@ namespace ScrumPokerBot.Domain
 
         public void ConnectToSession(PokerUser user, int sessionId)
         {
-            var session = GetSession(sessionId);
-            if (session != null && session.AllUsers.All(u => u.Username != user.Username))
+            try
             {
-                session.AddUser(user);
-                messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
+                var session = GetSession(sessionId);
+                if (session != null && session.AllUsers.All(u => u.ChatId != user.ChatId))
+                {
+                    session.AddUser(user);
+                    messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
+                }
+                if (session == null)
+                {
+                    messageSender.NoSessionFound(user, sessionId);
+                }
             }
-            if (session == null)
+            catch (NullReferenceException e)
             {
-                messageSender.NoSessionFound(user, sessionId);
             }
         }
 
@@ -54,19 +61,12 @@ namespace ScrumPokerBot.Domain
 
             if (user.ChatId == session.MasterUser.ChatId)
             {
-                this.CloseSession(session);
+                CloseSession(session);
                 return;
             }
 
             messageSender.SendUserLeaveSession(session.MasterUser, user);
             session.RemoveUser(user);
-        }
-
-        private void CloseSession(ScrumPokerSession session)
-        {
-            var users = session.AllUsers.ToArray();
-            messageSender.InformUserSessionEnded(session, users);
-            this.ScrumPokerSessions.Remove(session.Id);
         }
 
         public void StartPoker(PokerUser user, string description)
@@ -113,6 +113,13 @@ namespace ScrumPokerBot.Domain
             messageSender.SendUsers(session.AllUsers, user);
         }
 
+        private void CloseSession(ScrumPokerSession session)
+        {
+            var users = session.AllUsers.ToArray();
+            messageSender.InformUserSessionEnded(session, users);
+            ScrumPokerSessions.Remove(session.Id);
+        }
+
         private bool EnsureSession(PokerUser user, ScrumPokerSession session)
         {
             if (session != null) return true;
@@ -140,41 +147,22 @@ namespace ScrumPokerBot.Domain
         }
     }
 
-    public class MyList : IEnumerable<ScrumPokerSession>
+    public class MyList<T> : IEnumerable<T> where T: IHaveId
     {
-        private List<ScrumPokerSession> items;
-        private object lockObj;
+        private readonly List<T> items;
+        private readonly object lockObj;
+
         public MyList()
         {
-            this.items = new List<ScrumPokerSession>();
-            this.lockObj = new object();
+            items = new List<T>();
+            lockObj = new object();
         }
 
-        public void Add(ScrumPokerSession session)
+        public IEnumerator<T> GetEnumerator()
         {
             lock (lockObj)
             {
-                this.items.Add(session);
-            }
-        }
-
-        public void Remove(int sessionId)
-        {
-            lock (lockObj)
-            {
-                var session = this.items.FirstOrDefault(g => g.Id == sessionId);
-                if (session != null)
-                {
-                this.items.Remove(session);
-                }
-            }
-        }
-
-        public IEnumerator<ScrumPokerSession> GetEnumerator()
-        {
-            lock (lockObj)
-            {
-               return items.GetEnumerator();
+                return items.GetEnumerator();
             }
         }
 
@@ -182,5 +170,38 @@ namespace ScrumPokerBot.Domain
         {
             return GetEnumerator();
         }
+
+        public void Add(T session)
+        {
+            lock (lockObj)
+            {
+                if (session == null)
+                {
+                    
+                }
+                items.Add(session);
+            }
+        }
+
+        public T[] ToArrayLocked()
+        {
+            lock (lockObj)
+            {
+                return this.items.ToArray();
+            }
+        }
+
+        public void Remove(int sessionId)
+        {
+            lock (lockObj)
+            {
+                var session = items.FirstOrDefault(g => g.Id == sessionId);
+                if (session != null)
+                {
+                    items.Remove(session);
+                }
+            }
+        }
     }
+    
 }

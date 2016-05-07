@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="CommandType.cs" />
     <Compile Include="IHandle.cs" />
+    <Compile Include="IHaveId.cs" />
     <Compile Include="IMessageBus.cs" />
     <Compile Include="ISubscription.cs" />
     <Compile Include="Messages\ConnectSessionMessage.cs" />

@@ -7,7 +7,7 @@ namespace ScrumPokerBot.Domain
 {
     public interface IScrumPokerService
     {
-        MyList ScrumPokerSessions { get; }
+        MyList<ScrumPokerSession> ScrumPokerSessions { get; }
         int StartNewSession(PokerUser user);
         void ConnectToSession(PokerUser user, int sessionId);
         void StartPoker(PokerUser user, string description);

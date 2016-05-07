@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="ConnectionMessageTests.cs" />
     <Compile Include="EstimationMessageTests.cs" />
+    <Compile Include="MultiThread.cs" />
     <Compile Include="RunningPokerTests.cs" />
     <Compile Include="ScrumPokerServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

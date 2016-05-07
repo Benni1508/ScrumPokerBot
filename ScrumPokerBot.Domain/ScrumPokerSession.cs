@@ -4,13 +4,13 @@ using ScrumPokerBot.Contracts;
 
 namespace ScrumPokerBot.Domain
 {
-    public class ScrumPokerSession
+    public class ScrumPokerSession : IHaveId
     {
-        private readonly List<PokerUser> users;
+        private readonly MyList<PokerUser> users;
 
         public ScrumPokerSession(PokerUser user, int id)
         {
-            users = new List<PokerUser>();
+            users = new MyList<PokerUser>();
             users.Add(user);
             Id = id;
             MasterUser = user;
@@ -20,7 +20,7 @@ namespace ScrumPokerBot.Domain
         public PokerUser MasterUser { get; }
 
 
-        public PokerUser[] AllUsers => users.ToArray();
+        public PokerUser[] AllUsers => users.ToArrayLocked();
         public bool CanStartPoker { get { return this.Poker == null; } }
         public RunningPoker Poker { get; private set; }
 
@@ -34,7 +34,7 @@ namespace ScrumPokerBot.Domain
             var foundUser = users.FirstOrDefault(u => u.ChatId == user.ChatId);
             if (foundUser != null )
             {
-                users.Remove(foundUser);
+                users.Remove((int) foundUser.ChatId);
             }
         }
 
