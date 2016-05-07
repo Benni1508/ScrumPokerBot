@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using ScrumPokerBot.Contracts;
 
@@ -13,9 +13,10 @@ namespace ScrumPokerBot.Domain
         {
             this.messageSender = messageSender;
             this.idGenerator = idGenerator;
+            ScrumPokerSessions = new BlockingCollection<ScrumPokerSession>();
         }
 
-        public List<ScrumPokerSession> ScrumPokerSessions { get; } = new List<ScrumPokerSession>();
+        public BlockingCollection<ScrumPokerSession> ScrumPokerSessions { get; }
 
         public int StartNewSession(PokerUser user)
         {
@@ -47,6 +48,8 @@ namespace ScrumPokerBot.Domain
         public void LeaveSession(PokerUser user)
         {
             var session = GetSession(user);
+            if (!EnsureSession(user, session)) return;
+
             messageSender.SendUserLeaveSession(session.MasterUser, user);
             session.RemoveUser(user);
         }
@@ -54,11 +57,8 @@ namespace ScrumPokerBot.Domain
         public void StartPoker(PokerUser user, string description)
         {
             var session = GetSession(user);
-            if (session == null)
-            {
-                messageSender.NoSessionForUser(user);
-                return;
-            }
+            if (!EnsureSession(user, session)) return;
+
             if (!session.CanStartPoker)
             {
                 messageSender.PokerAlreadyRunning(user.ChatId);
@@ -67,35 +67,61 @@ namespace ScrumPokerBot.Domain
             messageSender.SendPokerToUsers(session.AllUsers, description);
         }
 
+        public void Estimate(PokerUser user, int estimation)
+        {
+            var session = GetSession(user);
+            if (!EnsureSession(user, session))
+            {
+                return;
+            }
+
+            if (session.CanStartPoker)
+            {
+                messageSender.NoPokerRunning(user);
+                return;
+            }
+            if (!session.CanUserEstimate(user))
+            {
+                messageSender.EstimationAlreadyCounted(user);
+            }
+            if (!session.Estimate(user, estimation)) return;
+
+            messageSender.SendPokerResult(session);
+            session.ClearPoker();
+        }
+
+        public void ShowAllUsers(PokerUser user)
+        {
+            var session = GetSession(user);
+            if (!EnsureMasterUser(user, session) || !EnsureMasterUser(user, session)) return;
+
+            messageSender.SendUsers(session.AllUsers, user);
+        }
+
+        private bool EnsureSession(PokerUser user, ScrumPokerSession session)
+        {
+            if (session != null) return true;
+            messageSender.NoSessionForUser(user);
+            return false;
+        }
+
+        private bool EnsureMasterUser(PokerUser user, ScrumPokerSession session)
+        {
+            if (session.MasterUser.ChatId == user.ChatId) return true;
+
+            messageSender.NotMasterUser(user);
+            return false;
+        }
+
         private ScrumPokerSession GetSession(PokerUser user)
         {
             var session = ScrumPokerSessions.FirstOrDefault(s => s.AllUsers.Any(u => u.ChatId == user.ChatId));
             return session;
         }
 
-
-
         private ScrumPokerSession GetSession(int sessionId)
         {
             return ScrumPokerSessions.SingleOrDefault(s => s.Id == sessionId);
-        }
-
-        public void Estimate(PokerUser user, int estimation)
-        {
-            var session = GetSession(user);
-            if (session.CanStartPoker)
-            {
-                messageSender.NoPokerRunning(user);
-                return;
-            }
-            else if (!session.CanUserEstimate(user))
-            {
-                this.messageSender.EstimationAlreadyCounted(user);
-            }
-            if (!session.Estimate(user, estimation)) return;
-
-            this.messageSender.SendPokerResult(session);
-            session.ClearPoker();
         }
     }
 }

@@ -18,5 +18,7 @@ namespace ScrumPokerBot.Domain
         void UserAlreadyInSession(PokerUser user);
         void SendUserLeaveSession(PokerUser masterUser, PokerUser user);
         void EstimationAlreadyCounted(PokerUser user);
+        void NotMasterUser(PokerUser user);
+        void SendUsers(PokerUser[] allUsers, PokerUser user);
     }
 }

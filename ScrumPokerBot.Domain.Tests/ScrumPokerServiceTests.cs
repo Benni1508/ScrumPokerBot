@@ -76,7 +76,21 @@ namespace ScrumPokerBot.Domain.Tests
             messageSender.Received().UserAlreadyInSession(Arg.Any<PokerUser>());
         }
 
+        [Fact]
+        public void StartPoker_WithoutSession()
+        {
+            service.StartPoker(TestHelpers.GetTestUser(1), "");
+            this.messageSender.Received().NoSessionForUser(Arg.Any<PokerUser>());
+        }
 
+        [Fact]
+        public void StartPoker_WithoutExistingPoker()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.StartPoker(TestHelpers.GetTestUser(1), "");
+            service.StartPoker(TestHelpers.GetTestUser(1), "");
+            this.messageSender.Received().PokerAlreadyRunning(Arg.Is<long>(u => u == 1));
+        }
 
         [Fact]
         public void Estimation()

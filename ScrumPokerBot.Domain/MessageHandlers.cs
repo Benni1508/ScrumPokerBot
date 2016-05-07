@@ -4,7 +4,7 @@ using ScrumPokerBot.Contracts.Messages;
 namespace ScrumPokerBot.Domain
 {
     public class MessageHandlers : IHandle<StartSessionMessage>, IHandle<ConnectSessionMessage>,
-        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>, IHandle<UnknownCommandMessage>
+        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>, IHandle<UnknownCommandMessage>, IHandle<GetSessionUsersMessage>
     {
         private readonly IScrumPokerService service;
         private readonly IMessageBus bus;
@@ -16,6 +16,7 @@ namespace ScrumPokerBot.Domain
             this.bus = bus;
             this.messageSender = messageSender;
             bus.Subscribe<StartSessionMessage>(this);
+            bus.Subscribe<GetSessionUsersMessage>(this);
             bus.Subscribe<ConnectSessionMessage>(this);
             bus.Subscribe<StartPokerMessage>(this);
             bus.Subscribe<EstimationMessage>(this);
@@ -53,6 +54,11 @@ namespace ScrumPokerBot.Domain
         public void Handle(UnknownCommandMessage message)
         {
             this.messageSender.SendUnknownCommand(message);
+        }
+
+        public void Handle(GetSessionUsersMessage message)
+        {
+            this.service.ShowAllUsers(message.User);
         }
     }
 }

@@ -59,6 +59,7 @@
     <Compile Include="Messages\ConnectSessionMessage.cs" />
     <Compile Include="Messages\EstimationMessage.cs" />
     <Compile Include="IMessage.cs" />
+    <Compile Include="Messages\GetSessionUsersMessage.cs" />
     <Compile Include="Messages\ITelegramMessage.cs" />
     <Compile Include="Messages\LeaveSessionMessage.cs" />
     <Compile Include="PokerUser.cs" />

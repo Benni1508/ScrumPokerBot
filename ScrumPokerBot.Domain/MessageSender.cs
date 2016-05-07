@@ -113,6 +113,24 @@ namespace ScrumPokerBot.Domain
             this.bot.SendTextMessage(user.ChatId, text);
         }
 
+        public void NotMasterUser(PokerUser user)
+        {
+            var text = "Für diese Funktion musst du Masteruser sein.";
+            this.bot.SendTextMessage(user.ChatId, text);
+        }
+
+        public void SendUsers(PokerUser[] allUsers, PokerUser user)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Folgede Benutzer nehmen teil:");
+            foreach (var pokerUser in allUsers)
+            {
+                sb.AppendLine($"- {pokerUser}");
+            }
+
+            this.bot.SendTextMessage(user.ChatId, sb.ToString());
+        }
+
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {
             var masterText = $"Der Benutzer {any.Lastname}, {any.Firstname} wurde der Session hinzugefügt.";
