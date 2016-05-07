@@ -13,12 +13,13 @@ namespace ScrumPokerBot.Domain
         void NoSessionForUser(PokerUser user);
         void PokerAlreadyRunning(long requesterChatId);
         void SendPokerToUsers(PokerUser[] allUsers, string description);
-        void SendPokerResult(ScrumPokerSession session);
+        void SendPokerResult(ScrumPokerSession session, string result);
         void NoPokerRunning(PokerUser user);
         void UserAlreadyInSession(PokerUser user);
         void SendUserLeaveSession(PokerUser masterUser, PokerUser user);
         void EstimationAlreadyCounted(PokerUser user);
         void NotMasterUser(PokerUser user);
         void SendUsers(PokerUser[] allUsers, PokerUser user);
+        void InformUserSessionEnded(ScrumPokerSession session, PokerUser[] users);
     }
 }

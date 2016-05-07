@@ -25,7 +25,7 @@ namespace ScrumPokerBot.Domain.Tests
         public void StartNewSession_ShouldReturnsSessionid()
         {
             service.StartNewSession(TestHelpers.GetTestUser(123));
-            service.ScrumPokerSessions.Count.Should().Be(1);
+            service.ScrumPokerSessions.Count().Should().Be(1);
             service.ScrumPokerSessions.First().MasterUser.ChatId.Should().Be(123);
         }
 
@@ -52,7 +52,7 @@ namespace ScrumPokerBot.Domain.Tests
 
             service.LeaveSession(TestHelpers.GetTestUser(2));
 
-            service.ScrumPokerSessions.Count.Should().Be(1);
+            service.ScrumPokerSessions.Count().Should().Be(1);
             messageSender.Received().SendUserLeaveSession(Arg.Is<PokerUser>(u => u.ChatId == 123), Arg.Is<PokerUser>(u => u.ChatId== 2));
         }
 
@@ -102,11 +102,16 @@ namespace ScrumPokerBot.Domain.Tests
             service.StartPoker(TestHelpers.GetTestUser(1), "");
             service.Estimate(TestHelpers.GetTestUser(1), 1); 
             
-            this.messageSender.DidNotReceive().SendPokerResult(Arg.Any<ScrumPokerSession>());
+            this.messageSender.DidNotReceive().SendPokerResult(Arg.Any<ScrumPokerSession>(), Arg.Any<string>());
             service.Estimate(TestHelpers.GetTestUser(2), 3);
-            this.messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>());
+            this.messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>(), Arg.Any<string>());
+        }
 
-
+        [Fact]
+        public void Estimation_WithoutSession()
+        {
+            service.Estimate(TestHelpers.GetTestUser(1),2);
+            this.messageSender.NoSessionForUser(Arg.Any<PokerUser>());
         }
 
         [Fact]
@@ -125,7 +130,7 @@ namespace ScrumPokerBot.Domain.Tests
             this.messageSender.Received().EstimationAlreadyCounted(Arg.Any<PokerUser>());
 
             service.Estimate(TestHelpers.GetTestUser(3), 3);
-            messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>());
+            messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>(), Arg.Any<string>());
         }
 
         [Fact]

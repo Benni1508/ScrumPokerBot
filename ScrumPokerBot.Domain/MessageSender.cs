@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using ScrumPokerBot.Contracts;
@@ -41,7 +42,7 @@ namespace ScrumPokerBot.Domain
 
         public void SendUnknownCommand(UnknownCommandMessage message)
         {
-            var text = $"Der Befehl \"{message.Message}\" ist nicht unbekannt!";
+            var text = $"Der Befehl \"{message.Message}\" ist unbekannt!";
             bot.SendTextMessage(message.User.ChatId, text);
         }
 
@@ -53,7 +54,7 @@ namespace ScrumPokerBot.Domain
 
         public void NoSessionForUser(PokerUser user)
         {
-            var text = $"Du bist in keine laufenden Session";
+            var text = $"Du bist in keiner laufenden Session.";
             bot.SendTextMessage(user.ChatId, text);
         }
 
@@ -65,25 +66,26 @@ namespace ScrumPokerBot.Domain
 
         public void SendPokerToUsers(PokerUser[] allUsers, string description)
         {
-            var text = "Gib deine Schätzunng an";
+            string text;
+            if (string.IsNullOrEmpty(description))
+            {
+                text = "Gib deine Schätzunng ab:";
+            }
+            else
+            {
+                text = $"Gib deine Schätzung für {description} ab.";
+            }
             foreach (var user in allUsers)
             {
                 bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkup);
             }
         }
 
-        public void SendPokerResult(ScrumPokerSession session)
+        public void SendPokerResult(ScrumPokerSession session, string result)
         {
-            var x = session.Poker.Users.GroupBy(u => u.Estimation);
-            var results = x.ToDictionary(k => k.Key, v => v.Count());
-            var sb = new StringBuilder();
-            foreach (var result in results)
-            {
-                sb.AppendLine($"{result.Value} x {result.Key} Story points");
-            }
             foreach (var pokerUser in session.AllUsers)
             {
-                bot.SendTextMessage(pokerUser.ChatId, sb.ToString());
+                bot.SendTextMessage(pokerUser.ChatId, result);
             }
         }
 
@@ -129,6 +131,15 @@ namespace ScrumPokerBot.Domain
             }
 
             this.bot.SendTextMessage(user.ChatId, sb.ToString());
+        }
+
+        public void InformUserSessionEnded(ScrumPokerSession session, PokerUser[] users)
+        {
+            var text = "Die Session wurde beendet.";
+            foreach (var pokerUser in users)
+            {
+                bot.SendTextMessage(pokerUser.ChatId, text);
+            }
         }
 
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)

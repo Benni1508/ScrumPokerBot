@@ -18,13 +18,13 @@ namespace ScrumPokerBot.Telgram
 
         public void PublishMessage(Message message)
         {
-            var from = message.From;
             var user = new PokerUser(message.Chat);
 
             var estimation = new EstimationMessage(user,message.Text);
             if (estimation.IsValid )
             {
                 bus.Publish(estimation);
+                return;
             }
          
             if (message.Text.StartsWith("/"))

@@ -45,7 +45,7 @@ namespace ScrumPokerBot.Domain
 
         public bool Estimate(PokerUser user, int estimation)
         {
-            var userEstimation = this.Poker.Users.FirstOrDefault(ue => ue.ChatId == user.ChatId);
+            var userEstimation = this.Poker.Users.FirstOrDefault(ue => ue.User.ChatId == user.ChatId);
             if (userEstimation != null && !userEstimation.EstimationReceived)
             {
                 userEstimation.SetEstimation(estimation);
@@ -65,7 +65,7 @@ namespace ScrumPokerBot.Domain
 
         public bool CanUserEstimate(PokerUser user)
         {
-            var estimation = this.Poker.Users.FirstOrDefault(u => u.ChatId == user.ChatId);
+            var estimation = this.Poker.Users.FirstOrDefault(u => u.User.ChatId == user.ChatId);
             return !estimation.EstimationReceived;
         }
     }

@@ -7,7 +7,7 @@ namespace ScrumPokerBot.Domain
 {
     public interface IScrumPokerService
     {
-        BlockingCollection<ScrumPokerSession> ScrumPokerSessions { get; }
+        MyList ScrumPokerSessions { get; }
         int StartNewSession(PokerUser user);
         void ConnectToSession(PokerUser user, int sessionId);
         void StartPoker(PokerUser user, string description);

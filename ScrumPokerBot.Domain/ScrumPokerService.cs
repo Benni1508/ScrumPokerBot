@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using ScrumPokerBot.Contracts;
 
@@ -13,10 +15,10 @@ namespace ScrumPokerBot.Domain
         {
             this.messageSender = messageSender;
             this.idGenerator = idGenerator;
-            ScrumPokerSessions = new BlockingCollection<ScrumPokerSession>();
+            ScrumPokerSessions = new MyList();;
         }
 
-        public BlockingCollection<ScrumPokerSession> ScrumPokerSessions { get; }
+        public MyList ScrumPokerSessions { get; }
 
         public int StartNewSession(PokerUser user)
         {
@@ -50,8 +52,21 @@ namespace ScrumPokerBot.Domain
             var session = GetSession(user);
             if (!EnsureSession(user, session)) return;
 
+            if (user.ChatId == session.MasterUser.ChatId)
+            {
+                this.CloseSession(session);
+                return;
+            }
+
             messageSender.SendUserLeaveSession(session.MasterUser, user);
             session.RemoveUser(user);
+        }
+
+        private void CloseSession(ScrumPokerSession session)
+        {
+            var users = session.AllUsers.ToArray();
+            messageSender.InformUserSessionEnded(session, users);
+            this.ScrumPokerSessions.Remove(session.Id);
         }
 
         public void StartPoker(PokerUser user, string description)
@@ -86,7 +101,7 @@ namespace ScrumPokerBot.Domain
             }
             if (!session.Estimate(user, estimation)) return;
 
-            messageSender.SendPokerResult(session);
+            messageSender.SendPokerResult(session, session.Poker.ToString());
             session.ClearPoker();
         }
 
@@ -122,6 +137,50 @@ namespace ScrumPokerBot.Domain
         private ScrumPokerSession GetSession(int sessionId)
         {
             return ScrumPokerSessions.SingleOrDefault(s => s.Id == sessionId);
+        }
+    }
+
+    public class MyList : IEnumerable<ScrumPokerSession>
+    {
+        private List<ScrumPokerSession> items;
+        private object lockObj;
+        public MyList()
+        {
+            this.items = new List<ScrumPokerSession>();
+            this.lockObj = new object();
+        }
+
+        public void Add(ScrumPokerSession session)
+        {
+            lock (lockObj)
+            {
+                this.items.Add(session);
+            }
+        }
+
+        public void Remove(int sessionId)
+        {
+            lock (lockObj)
+            {
+                var session = this.items.FirstOrDefault(g => g.Id == sessionId);
+                if (session != null)
+                {
+                this.items.Remove(session);
+                }
+            }
+        }
+
+        public IEnumerator<ScrumPokerSession> GetEnumerator()
+        {
+            lock (lockObj)
+            {
+               return items.GetEnumerator();
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

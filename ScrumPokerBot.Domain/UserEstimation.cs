@@ -1,14 +1,17 @@
+using ScrumPokerBot.Contracts;
+
 namespace ScrumPokerBot.Domain
 {
     public class UserEstimation
     {
-        public UserEstimation(long chatId)
+        public PokerUser User { get; set; }
+
+        public UserEstimation(PokerUser user)
         {
-            ChatId = chatId;
+            User = user;
         }
 
         public int Estimation { get; private set; }
-        public long ChatId { get; }
         public bool EstimationReceived { get; private set; }
 
         public void SetEstimation(int estimation)
