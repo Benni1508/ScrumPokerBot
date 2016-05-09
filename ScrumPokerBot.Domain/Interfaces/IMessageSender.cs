@@ -22,5 +22,6 @@ namespace ScrumPokerBot.Domain.Interfaces
         void NotMasterUser(PokerUser user);
         void SendUsers(PokerUser[] allUsers, PokerUser user);
         void InformUserSessionEnded(ScrumPokerSession session, PokerUser[] users);
+        void SendConnections(PokerUser user, int[] ids);
     }
 }

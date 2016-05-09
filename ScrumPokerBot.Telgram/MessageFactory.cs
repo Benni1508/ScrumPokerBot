@@ -36,13 +36,11 @@ namespace ScrumPokerBot.Telgram
                         bus.Publish(new StartSessionMessage(user, message.Text));
                         return;
                     case "/connect":
-                        var connectMessage =  new ConnectSessionMessage(user, message.Text);
-                        if (connectMessage.IsValid )
-                        {
-                            bus.Publish(connectMessage);
-                            return;
-                        }
-                        bus.Publish(new UnknownCommandMessage(user, message.Text));
+                        var connectMessage = new ConnectSessionMessage(user, message.Text);
+
+                        bus.Publish(connectMessage);
+                        return;
+
                         return;
                     case "/poker":
                         bus.Publish(new StartPokerMessage(user, message.Text));

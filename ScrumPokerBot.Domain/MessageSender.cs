@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ScrumPokerBot.Contracts;
@@ -23,6 +24,8 @@ namespace ScrumPokerBot.Domain
             new[] {"13 Story Points"},
             new[] {"20 Story Points"}
         };
+
+        private static readonly string Connection = "/connect {0}";
 
         private readonly Api bot;
         private readonly ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup {Keyboard = keyboard};
@@ -143,6 +146,15 @@ namespace ScrumPokerBot.Domain
                 bot.SendTextMessage(pokerUser.ChatId, text);
             }
         }
+
+        public void SendConnections(PokerUser user, int[] ids)
+        {
+            var keyboard = ids.Select(id => new [] {string.Format(Connection, id)}).ToList();
+            var keyboardMarkup = new ReplyKeyboardMarkup {Keyboard = keyboard.ToArray()};
+            var text = "Wähle die Session!";
+            bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkup);
+        }
+
 
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {

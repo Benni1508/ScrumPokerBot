@@ -19,7 +19,6 @@ namespace ScrumPokerBot.Domain.MessageBus
             Type messageType = message.GetType();
             if (!subscriptions.ContainsKey(messageType)) return;
 
-            var list = subscriptions.Single(s => s.Key == messageType).Value;
             var subscriptionList = new List<ISubscription<TMessage>>(subscriptions[messageType].Cast<ISubscription<TMessage>>());
             foreach (var subscription in subscriptionList)
             {

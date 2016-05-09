@@ -8,13 +8,11 @@ namespace ScrumPokerBot.Domain
         IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>, IHandle<UnknownCommandMessage>, IHandle<GetSessionUsersMessage>
     {
         private readonly IScrumPokerService service;
-        private readonly IMessageBus bus;
         private readonly IMessageSender messageSender;
 
         public MessageHandlers(IScrumPokerService service, IMessageBus bus, IMessageSender messageSender)
         {
             this.service = service;
-            this.bus = bus;
             this.messageSender = messageSender;
             bus.Subscribe<StartSessionMessage>(this);
             bus.Subscribe<GetSessionUsersMessage>(this);
@@ -32,7 +30,14 @@ namespace ScrumPokerBot.Domain
 
         public void Handle(ConnectSessionMessage message)
         {
-            service.ConnectToSession(message.User, message.Sessionid);
+            if (message.IsValid)
+            {
+                service.ConnectToSession(message.User, message.Sessionid);
+            }
+            else
+            {
+                service.SendConnections(message.User);
+            }
         }
 
         public void Handle(StartPokerMessage message)
