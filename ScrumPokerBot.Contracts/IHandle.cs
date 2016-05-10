@@ -1,6 +1,6 @@
 namespace ScrumPokerBot.Contracts
 {
-    public interface IHandle<T>
+    public interface IHandle<in T>
     {
         void Handle(T message);
     }

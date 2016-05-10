@@ -4,7 +4,7 @@ namespace ScrumPokerBot.Domain.Dtos
 {
     public class UserEstimation
     {
-        public PokerUser User { get; set; }
+        public PokerUser User { get; private set; }
 
         public UserEstimation(PokerUser user)
         {

@@ -1,15 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Win32;
 using NSubstitute;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.Dtos;
 using ScrumPokerBot.Domain.Interfaces;
-using ScrumPokerBot.Telgram;
-using Telegram.Bot.Types;
 using Xunit;
 
 namespace ScrumPokerBot.Domain.Tests
@@ -24,7 +19,7 @@ namespace ScrumPokerBot.Domain.Tests
             var q = new Queue<int>(new[] {12, 13, 14, 15, 16});
             messageSender = Substitute.For<IMessageSender>();
             var idGenerator = Substitute.For<IIdGenerator>();
-            idGenerator.GetId().Returns((i) => q.Dequeue());
+            idGenerator.GetId().Returns(i => q.Dequeue());
             service = new ScrumPokerService(messageSender, idGenerator);
         }
 
@@ -70,7 +65,7 @@ namespace ScrumPokerBot.Domain.Tests
         {
             service.StartNewSession(TestHelpers.GetTestUser(123));
             service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
-            service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(2);
+            service.ScrumPokerSessions.First().AllUsers.Length.Should().Be(2);
 
             messageSender.Received().InformaAddedUserAndMaster(Arg.Any<PokerUser>(), Arg.Any<PokerUser>());
         }
@@ -83,7 +78,7 @@ namespace ScrumPokerBot.Domain.Tests
 
             service.LeaveSession(TestHelpers.GetTestUser(1));
 
-            this.messageSender.Received().InformUserSessionEnded(Arg.Any<ScrumPokerSession>(), Arg.Any<PokerUser[]>());
+            this.messageSender.Received().InformUserSessionEnded(Arg.Any<PokerUser[]>());
             this.service.ScrumPokerSessions.Count().Should().Be(0);
         }
 
@@ -116,7 +111,7 @@ namespace ScrumPokerBot.Domain.Tests
             service.StartNewSession(TestHelpers.GetTestUser(123));
             service.StartNewSession(TestHelpers.GetTestUser(123));
 
-            service.ScrumPokerSessions.First().AllUsers.Count().Should().Be(1);
+            service.ScrumPokerSessions.First().AllUsers.Length.Should().Be(1);
 
             messageSender.Received().UserAlreadyInSession(Arg.Any<PokerUser>());
         }

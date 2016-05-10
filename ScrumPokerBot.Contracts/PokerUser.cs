@@ -1,4 +1,3 @@
-using System;
 using Telegram.Bot.Types;
 
 namespace ScrumPokerBot.Contracts
@@ -27,6 +26,6 @@ namespace ScrumPokerBot.Contracts
             return $"{Lastname}, {Firstname} ({Username})";
         }
 
-        public int Id { get { return (int) ChatId; } }
+        public int Id => (int) ChatId;
     }
 }

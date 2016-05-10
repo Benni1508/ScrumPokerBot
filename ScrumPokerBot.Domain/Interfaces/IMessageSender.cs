@@ -6,7 +6,6 @@ namespace ScrumPokerBot.Domain.Interfaces
 {
     public interface IMessageSender
     {
-        void SendEndSession(PokerUser[] allUsers);
         void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser);
         void SendStartSessionToMaster(PokerUser user, int sessionId);
         void SendUnknownCommand(UnknownCommandMessage message);
@@ -21,7 +20,7 @@ namespace ScrumPokerBot.Domain.Interfaces
         void EstimationAlreadyCounted(PokerUser user);
         void NotMasterUser(PokerUser user);
         void SendUsers(PokerUser[] allUsers, PokerUser user);
-        void InformUserSessionEnded(ScrumPokerSession session, PokerUser[] users);
+        void InformUserSessionEnded(PokerUser[] users);
         void SendConnections(PokerUser user, int[] ids);
         void NoRunningSession(PokerUser user);
         void AllreadyConnected(PokerUser user);

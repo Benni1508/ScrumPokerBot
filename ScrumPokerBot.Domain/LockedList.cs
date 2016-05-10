@@ -1,16 +1,16 @@
+using ScrumPokerBot.Contracts;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ScrumPokerBot.Contracts;
 
 namespace ScrumPokerBot.Domain
 {
-    public class MyList<T> : IEnumerable<T> where T: IHaveId
+    public class LockedList<T> : IEnumerable<T> where T: IHaveId
     {
         private readonly List<T> items;
         private readonly object lockObj;
 
-        public MyList()
+        public LockedList()
         {
             items = new List<T>();
             lockObj = new object();
@@ -29,15 +29,11 @@ namespace ScrumPokerBot.Domain
             return GetEnumerator();
         }
 
-        public void Add(T session)
+        public void Add(T item)
         {
             lock (lockObj)
             {
-                if (session == null)
-                {
-                    
-                }
-                items.Add(session);
+                items.Add(item);
             }
         }
 

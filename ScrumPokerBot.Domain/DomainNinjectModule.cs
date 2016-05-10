@@ -2,7 +2,6 @@
 using Ninject.Modules;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.Interfaces;
-using ScrumPokerBot.Domain.MessageBus;
 
 namespace ScrumPokerBot.Domain
 {

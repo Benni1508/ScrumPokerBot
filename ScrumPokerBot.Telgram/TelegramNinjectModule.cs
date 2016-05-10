@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Ninject.Modules;
-using ScrumPokerBot.Contracts;
 using Telegram.Bot;
 
 namespace ScrumPokerBot.Telgram

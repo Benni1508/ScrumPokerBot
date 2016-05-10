@@ -5,7 +5,7 @@
         void Publish<TMessage>(TMessage message)
             where TMessage : IMessage;
 
-        ISubscription<TMessage> Subscribe<TMessage>(IHandle<TMessage> handler)
+        void Subscribe<TMessage>(IHandle<TMessage> handler)
             where TMessage : IMessage;
 
     }

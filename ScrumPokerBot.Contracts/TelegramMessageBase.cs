@@ -2,9 +2,9 @@ using ScrumPokerBot.Contracts.Messages;
 
 namespace ScrumPokerBot.Contracts
 {
-    public abstract class TelegramMessageBase : IMessage
+    public abstract class TelegramMessageBase : ITelegramMessage
     {
-        public TelegramMessageBase(PokerUser user, string message)
+        protected TelegramMessageBase(PokerUser user, string message)
         {
             User = user;
             Message = message;

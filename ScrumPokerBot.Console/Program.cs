@@ -7,7 +7,7 @@ namespace ScrumPokerBot.Console
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             var kernel = new StandardKernel();
             kernel.Bind<IService>().To<Service>();

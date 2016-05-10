@@ -13,11 +13,11 @@ namespace ScrumPokerBot.Domain.Dtos
         {
             this.session = session;
             Users = session.AllUsers.Select(u => new UserEstimation(u)).ToList();
-            SessionId = session.Id;
+       
         }
 
-        public int SessionId { get; }
-        public List<UserEstimation> Users { get; set; }
+        
+        public List<UserEstimation> Users { get;}
 
         public override string ToString()
         {

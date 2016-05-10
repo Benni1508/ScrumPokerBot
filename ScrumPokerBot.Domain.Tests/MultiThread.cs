@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
@@ -25,7 +23,7 @@ namespace ScrumPokerBot.Domain.Tests
             var q = new Queue<int>(new[] { 1, 2, 3, 4, 5, 6 });
             messageSender = Substitute.For<IMessageSender>();
             var idGenerator = Substitute.For<IIdGenerator>();
-            idGenerator.GetId().Returns((i) => q.Dequeue());
+            idGenerator.GetId().Returns(i => q.Dequeue());
             service = new ScrumPokerService(messageSender, idGenerator);
         }
 
@@ -43,16 +41,18 @@ namespace ScrumPokerBot.Domain.Tests
         public async Task Test()
         {
             await Task.Run(() => Task1());
-            var l = new List<Task>();
-            l.Add(Task.Run(() => TaksAddUsers()));
-            l.Add(Task.Run(() => TaksAddUsers2()));
-            l.Add(Task.Run(() => TaksAddUsers3()));
+            var l = new List<Task>
+            {
+                Task.Run(() => TaksAddUsers()),
+                Task.Run(() => TaksAddUsers2()),
+                Task.Run(() => TaksAddUsers3())
+            };
 
             Task.WaitAll(l.ToArray());
             this.service.ScrumPokerSessions.Count().Should().Be(3);
-            this.service.ScrumPokerSessions.Single(s => s.Id == 1).AllUsers.Count().Should().Be(7);
-            this.service.ScrumPokerSessions.Single(s => s.Id == 2).AllUsers.Count().Should().Be(7);
-            this.service.ScrumPokerSessions.Single(s => s.Id == 3).AllUsers.Count().Should().Be(7);
+            this.service.ScrumPokerSessions.Single(s => s.Id == 1).AllUsers.Length.Should().Be(7);
+            this.service.ScrumPokerSessions.Single(s => s.Id == 2).AllUsers.Length.Should().Be(7);
+            this.service.ScrumPokerSessions.Single(s => s.Id == 3).AllUsers.Length.Should().Be(7);
         }
 
         private void Task1()

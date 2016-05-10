@@ -6,11 +6,11 @@ namespace ScrumPokerBot.Domain.MessageBus
     public class Subscription<TMessage> : ISubscription<TMessage>
         where TMessage : IMessage
     {
-        public IHandle<TMessage> Action { get; private set; }
+        public IHandle<TMessage> Action { get; }
 
         public Subscription(IHandle<TMessage> action)
         {
-            if (action == null) throw new ArgumentNullException("action");
+            if (action == null) throw new ArgumentNullException(nameof(action));
             Action = action;
         }
     }

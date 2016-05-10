@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.Dtos;
@@ -15,11 +14,10 @@ namespace ScrumPokerBot.Domain
         {
             this.messageSender = messageSender;
             this.idGenerator = idGenerator;
-            ScrumPokerSessions = new MyList<ScrumPokerSession>();
-            ;
+            ScrumPokerSessions = new LockedList<ScrumPokerSession>();
         }
 
-        public MyList<ScrumPokerSession> ScrumPokerSessions { get; }
+        public LockedList<ScrumPokerSession> ScrumPokerSessions { get; }
 
         public int StartNewSession(PokerUser user)
         {
@@ -85,10 +83,7 @@ namespace ScrumPokerBot.Domain
         public void Estimate(PokerUser user, int estimation)
         {
             var session = GetSession(user);
-            if (!EnsureSession(user))
-            {
-                return;
-            }
+            if (!EnsureSession(user)) return;
 
             if (session.CanStartPoker)
             {
@@ -104,22 +99,21 @@ namespace ScrumPokerBot.Domain
 
             messageSender.SendPokerResult(session, session.Poker.ToString());
             session.ClearPoker();
-
         }
 
         public void ShowAllUsers(PokerUser user)
         {
             var session = GetSession(user);
-            if (!EnsureMasterUser(user, session) || !EnsureMasterUser(user, session)) return;
+            if (!EnsureMasterUser(user)) return;
 
             messageSender.SendUsers(session.AllUsers, user);
         }
 
         public void SendConnections(PokerUser user)
         {
-            if (this.ScrumPokerSessions.Any())
+            if (ScrumPokerSessions.Any())
             {
-                var ids = this.ScrumPokerSessions.Select(s => s.Id).ToArray();
+                var ids = ScrumPokerSessions.Select(s => s.Id).ToArray();
                 messageSender.SendConnections(user, ids);
             }
             else
@@ -131,7 +125,7 @@ namespace ScrumPokerBot.Domain
         private void CloseSession(ScrumPokerSession session)
         {
             var users = session.AllUsers.ToArray();
-            messageSender.InformUserSessionEnded(session, users);
+            messageSender.InformUserSessionEnded(users);
             ScrumPokerSessions.Remove(session.Id);
         }
 
@@ -143,8 +137,9 @@ namespace ScrumPokerBot.Domain
             return false;
         }
 
-        private bool EnsureMasterUser(PokerUser user, ScrumPokerSession session)
+        private bool EnsureMasterUser(PokerUser user)
         {
+            var session = GetSession(user);
             if (session.MasterUser.ChatId == user.ChatId) return true;
 
             messageSender.NotMasterUser(user);

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ScrumPokerBot.Contracts;
-using Telegram.Bot.Types;
 
 namespace ScrumPokerBot.Domain.MessageBus
 {
@@ -14,7 +13,7 @@ namespace ScrumPokerBot.Domain.MessageBus
         public void Publish<TMessage>(TMessage message)
             where TMessage : IMessage
         {
-            if (message == null) throw new ArgumentNullException("message");
+            if (message == null) throw new ArgumentNullException(nameof(message));
 
             Type messageType = message.GetType();
             if (!subscriptions.ContainsKey(messageType)) return;
@@ -27,7 +26,7 @@ namespace ScrumPokerBot.Domain.MessageBus
                 
         }
 
-        public ISubscription<TMessage> Subscribe<TMessage>(IHandle<TMessage> handler)
+        public void Subscribe<TMessage>(IHandle<TMessage> handler)
             where TMessage : IMessage
         {
             Type messageType = typeof(TMessage);
@@ -37,8 +36,6 @@ namespace ScrumPokerBot.Domain.MessageBus
                 subscriptions[messageType].Add(subscription);
             else
                 subscriptions.Add(messageType, new List<ISubscription<TMessage>> { subscription });
-
-            return subscription;
         }
         
 

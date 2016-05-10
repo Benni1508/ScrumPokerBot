@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ScrumPokerBot.Contracts;
@@ -59,7 +57,7 @@ namespace ScrumPokerBot.Domain
 
         public void NoSessionForUser(PokerUser user)
         {
-            var text = $"Du bist in keiner laufenden Session.";
+            var text = "Du bist in keiner laufenden Session.";
             bot.SendTextMessage(user.ChatId, text);
         }
 
@@ -72,14 +70,9 @@ namespace ScrumPokerBot.Domain
         public void SendPokerToUsers(PokerUser[] allUsers, string description)
         {
             string text;
-            if (string.IsNullOrEmpty(description))
-            {
-                text = "Gib deine Schätzunng ab:";
-            }
-            else
-            {
-                text = $"Gib deine Schätzung für {description} ab.";
-            }
+            text = string.IsNullOrEmpty(description) 
+                ? "Gib deine Schätzunng ab:" 
+                : $"Gib deine Schätzung für {description} ab.";
             foreach (var user in allUsers)
             {
                 bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkup);
@@ -108,7 +101,7 @@ namespace ScrumPokerBot.Domain
 
         public void SendUserLeaveSession(PokerUser masterUser, PokerUser user)
         {
-            var masterText = $"Der User {user.ToString()} hat die Session verlassen!";
+            var masterText = $"Der User {user} hat die Session verlassen!";
             var userText = "Du hast die Session verlassen";
             bot.SendTextMessage(masterUser.ChatId, masterText);
             bot.SendTextMessage(user.ChatId, userText);
@@ -138,7 +131,7 @@ namespace ScrumPokerBot.Domain
             this.bot.SendTextMessage(user.ChatId, sb.ToString());
         }
 
-        public void InformUserSessionEnded(ScrumPokerSession session, PokerUser[] users)
+        public void InformUserSessionEnded(PokerUser[] users)
         {
             var text = "Die Session wurde beendet.";
             foreach (var pokerUser in users)
@@ -149,10 +142,10 @@ namespace ScrumPokerBot.Domain
 
         public void SendConnections(PokerUser user, int[] ids)
         {
-            var keyboard = ids.Select(id => new [] {string.Format(Connection, id)}).ToList();
-            var keyboardMarkup = new ReplyKeyboardMarkup {Keyboard = keyboard.ToArray()};
+            var keyboardLayout = ids.Select(id => new [] {string.Format(Connection, id)}).ToList();
+            var keyboardMarkupInternal = new ReplyKeyboardMarkup {Keyboard = keyboardLayout.ToArray()};
             var text = "Wähle die Session!";
-            bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkup);
+            bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkupInternal);
         }
 
         public void NoRunningSession(PokerUser user)

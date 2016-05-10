@@ -5,23 +5,23 @@ namespace ScrumPokerBot.Domain.Dtos
 {
     public class ScrumPokerSession : IHaveId
     {
-        private readonly MyList<PokerUser> users;
+        private readonly LockedList<PokerUser> users;
 
         public ScrumPokerSession(PokerUser user, int id)
         {
-            users = new MyList<PokerUser>();
-            users.Add(user);
+            users = new LockedList<PokerUser> {user};
             Id = id;
             MasterUser = user;
         }
 
-        public int Id { get; }
         public PokerUser MasterUser { get; }
 
 
         public PokerUser[] AllUsers => users.ToArrayLocked();
-        public bool CanStartPoker { get { return this.Poker == null; } }
+        public bool CanStartPoker => Poker == null;
         public RunningPoker Poker { get; private set; }
+
+        public int Id { get; }
 
         public void AddUser(PokerUser user)
         {
@@ -31,7 +31,7 @@ namespace ScrumPokerBot.Domain.Dtos
         public void RemoveUser(PokerUser user)
         {
             var foundUser = users.FirstOrDefault(u => u.ChatId == user.ChatId);
-            if (foundUser != null )
+            if (foundUser != null)
             {
                 users.Remove((int) foundUser.ChatId);
             }
@@ -39,12 +39,12 @@ namespace ScrumPokerBot.Domain.Dtos
 
         public void StartPoker()
         {
-            this.Poker = new RunningPoker(this);
+            Poker = new RunningPoker(this);
         }
 
         public bool Estimate(PokerUser user, int estimation)
         {
-            var userEstimation = this.Poker.Users.FirstOrDefault(ue => ue.User.ChatId == user.ChatId);
+            var userEstimation = Poker.Users.FirstOrDefault(ue => ue.User.ChatId == user.ChatId);
             if (userEstimation != null && !userEstimation.EstimationReceived)
             {
                 userEstimation.SetEstimation(estimation);
@@ -54,18 +54,18 @@ namespace ScrumPokerBot.Domain.Dtos
 
         private bool IsEstimationCompleted()
         {
-            return this.Poker.Users.All(u => u.EstimationReceived);
+            return Poker.Users.All(u => u.EstimationReceived);
         }
 
         public void ClearPoker()
         {
-            this.Poker = null;
+            Poker = null;
         }
 
         public bool CanUserEstimate(PokerUser user)
         {
-            var estimation = this.Poker.Users.FirstOrDefault(u => u.User.ChatId == user.ChatId);
-            return !estimation.EstimationReceived;
+            var estimation = Poker.Users.FirstOrDefault(u => u.User.ChatId == user.ChatId);
+            return estimation != null && !estimation.EstimationReceived;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace ScrumPokerBot.Contracts.Messages
             }
         }
 
-        public int Estimation { get; set; }
+        public int Estimation { get; }
 
         public bool IsValid { get; }
 

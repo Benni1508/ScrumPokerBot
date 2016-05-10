@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.Linq;
-using System.Text.RegularExpressions;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Contracts.Messages;
 using Telegram.Bot.Types;
@@ -21,7 +18,7 @@ namespace ScrumPokerBot.Telgram
             var user = new PokerUser(message.Chat);
 
             var estimation = new EstimationMessage(user,message.Text);
-            if (estimation.IsValid )
+            if (estimation.IsValid)
             {
                 bus.Publish(estimation);
                 return;
@@ -39,8 +36,6 @@ namespace ScrumPokerBot.Telgram
                         var connectMessage = new ConnectSessionMessage(user, message.Text);
 
                         bus.Publish(connectMessage);
-                        return;
-
                         return;
                     case "/poker":
                         bus.Publish(new StartPokerMessage(user, message.Text));

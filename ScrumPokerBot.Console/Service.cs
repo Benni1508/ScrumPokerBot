@@ -1,5 +1,3 @@
-using ScrumPokerBot.Domain;
-using ScrumPokerBot.Domain.Interfaces;
 using ScrumPokerBot.Telgram;
 
 namespace ScrumPokerBot.Console
@@ -7,12 +5,10 @@ namespace ScrumPokerBot.Console
     internal class Service : IService
     {
         private readonly IBotService botService;
-        private readonly IScrumPokerService scrumPokerService;
 
-        public Service(IBotService botService, IScrumPokerService scrumPokerService)
+        public Service(IBotService botService)
         {
             this.botService = botService;
-            this.scrumPokerService = scrumPokerService;
         }
 
         public void Start()
