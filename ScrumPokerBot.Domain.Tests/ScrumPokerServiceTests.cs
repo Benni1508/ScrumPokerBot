@@ -191,5 +191,33 @@ namespace ScrumPokerBot.Domain.Tests
             messageSender.Received().NoPokerRunning(Arg.Any<PokerUser>());
         }
 
+        [Fact]
+        public void Connect_WhenAlreadyConnected()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
+            this.messageSender.ClearReceivedCalls();
+            service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
+
+            messageSender.Received().AllreadyConnected(Arg.Any<PokerUser>());
+        }
+
+        [Fact]
+        public void SendConnections()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.StartNewSession(TestHelpers.GetTestUser(2));
+
+            service.SendConnections(TestHelpers.GetTestUser(3));
+            this.messageSender.Received().SendConnections(Arg.Any<PokerUser>(), Arg.Is<int[]>(i => i.Contains(12) && i.Contains(13)));
+        }
+
+        [Fact]
+        public void SendConnections_withoutSessions()
+        {
+            service.SendConnections(TestHelpers.GetTestUser(3));
+            this.messageSender.Received().NoRunningSession(Arg.Any<PokerUser>());
+        }
+
     }
 }

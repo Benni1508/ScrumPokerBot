@@ -155,6 +155,18 @@ namespace ScrumPokerBot.Domain
             bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkup);
         }
 
+        public void NoRunningSession(PokerUser user)
+        {
+            var text = "Aktuell läuft keine Session, du kannst mit '\\startsession' eine Session starten";
+            bot.SendTextMessage(user.ChatId, text);
+        }
+
+        public void AllreadyConnected(PokerUser user)
+        {
+            var text = "Du bist bereits verbunden, mit \\leaveSession kannst du deine aktuelle Session verlassen!";
+            bot.SendTextMessage(user.ChatId, text);
+        }
+
 
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {

@@ -36,28 +36,28 @@ namespace ScrumPokerBot.Domain
 
         public void ConnectToSession(PokerUser user, int sessionId)
         {
-            try
+            var session = GetSession(sessionId);
+
+            if (GetSession(user) != null)
             {
-                var session = GetSession(sessionId);
-                if (session != null && session.AllUsers.All(u => u.ChatId != user.ChatId))
-                {
-                    session.AddUser(user);
-                    messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
-                }
-                if (session == null)
-                {
-                    messageSender.NoSessionFound(user, sessionId);
-                }
+                messageSender.AllreadyConnected(user);
             }
-            catch (NullReferenceException e)
+
+            if (session != null && session.AllUsers.All(u => u.ChatId != user.ChatId))
             {
+                session.AddUser(user);
+                messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
+            }
+            if (session == null)
+            {
+                messageSender.NoSessionFound(user, sessionId);
             }
         }
 
         public void LeaveSession(PokerUser user)
         {
             var session = GetSession(user);
-            if (!EnsureSession(user, session)) return;
+            if (!EnsureSession(user)) return;
 
             if (user.ChatId == session.MasterUser.ChatId)
             {
@@ -72,7 +72,7 @@ namespace ScrumPokerBot.Domain
         public void StartPoker(PokerUser user, string description)
         {
             var session = GetSession(user);
-            if (!EnsureSession(user, session)) return;
+            if (!EnsureSession(user)) return;
 
             if (!session.CanStartPoker)
             {
@@ -85,7 +85,7 @@ namespace ScrumPokerBot.Domain
         public void Estimate(PokerUser user, int estimation)
         {
             var session = GetSession(user);
-            if (!EnsureSession(user, session))
+            if (!EnsureSession(user))
             {
                 return;
             }
@@ -122,6 +122,10 @@ namespace ScrumPokerBot.Domain
                 var ids = this.ScrumPokerSessions.Select(s => s.Id).ToArray();
                 messageSender.SendConnections(user, ids);
             }
+            else
+            {
+                messageSender.NoRunningSession(user);
+            }
         }
 
         private void CloseSession(ScrumPokerSession session)
@@ -131,8 +135,9 @@ namespace ScrumPokerBot.Domain
             ScrumPokerSessions.Remove(session.Id);
         }
 
-        private bool EnsureSession(PokerUser user, ScrumPokerSession session)
+        private bool EnsureSession(PokerUser user)
         {
+            var session = GetSession(user);
             if (session != null) return true;
             messageSender.NoSessionForUser(user);
             return false;
