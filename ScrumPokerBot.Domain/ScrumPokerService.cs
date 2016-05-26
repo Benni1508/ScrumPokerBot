@@ -71,7 +71,8 @@ namespace ScrumPokerBot.Domain
         {
             var session = GetSession(user);
             if (!EnsureSession(user)) return;
-
+            if (!EnsureMasterUser(user))
+                return;
             if (!session.CanStartPoker)
             {
                 messageSender.PokerAlreadyRunning(user.ChatId);

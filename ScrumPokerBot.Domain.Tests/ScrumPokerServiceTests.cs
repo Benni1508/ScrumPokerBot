@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using FluentAssertions;
 using NSubstitute;
 using ScrumPokerBot.Contracts;
@@ -121,6 +122,14 @@ namespace ScrumPokerBot.Domain.Tests
         {
             service.StartPoker(TestHelpers.GetTestUser(1), "");
             this.messageSender.Received().NoSessionForUser(Arg.Any<PokerUser>());
+        }
+        [Fact]
+        public void StartPoker_NotMaster()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.ConnectToSession(TestHelpers.GetTestUser(124),12);
+            service.StartPoker(TestHelpers.GetTestUser(124), "");
+            this.messageSender.Received().NotMasterUser(Arg.Any<PokerUser>());
         }
 
         [Fact]
