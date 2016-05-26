@@ -23,7 +23,7 @@ namespace ScrumPokerBot.Domain
             new[] {"20 Story Points"}
         };
 
-        private static readonly string Connection = "/connect {0}";
+        private static readonly string Connection = "/connect {0} von {1}";
 
         private readonly Api bot;
         private readonly ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup {Keyboard = keyboard};
@@ -140,9 +140,9 @@ namespace ScrumPokerBot.Domain
             }
         }
 
-        public void SendConnections(PokerUser user, int[] ids)
+        public void SendConnections(PokerUser user, ScrumPokerSession[] sessions)
         {
-            var keyboardLayout = ids.Select(id => new [] {string.Format(Connection, id)}).ToList();
+            var keyboardLayout = sessions.Select(s => new [] {string.Format(Connection, s.Id, s.MasterUser)}).ToList();
             var keyboardMarkupInternal = new ReplyKeyboardMarkup {Keyboard = keyboardLayout.ToArray()};
             var text = "Wähle die Session!";
             bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkupInternal);

@@ -17,7 +17,7 @@ namespace ScrumPokerBot.Domain
             ScrumPokerSessions = new LockedList<ScrumPokerSession>();
         }
 
-        public LockedList<ScrumPokerSession> ScrumPokerSessions { get; }
+        internal LockedList<ScrumPokerSession> ScrumPokerSessions { get; }
 
         public int StartNewSession(PokerUser user)
         {
@@ -96,10 +96,13 @@ namespace ScrumPokerBot.Domain
                 messageSender.EstimationAlreadyCounted(user);
             }
 
-            if (!session.Estimate(user, estimation)) return;
+            session.Estimate(user, estimation);
 
-            messageSender.SendPokerResult(session, session.Poker.ToString());
-            session.ClearPoker();
+            if (session.IsEstimationCompleted())
+            {
+                messageSender.SendPokerResult(session, session.Poker.ToString());
+                session.ClearPoker();
+            }
         }
 
         public void ShowAllUsers(PokerUser user)
@@ -114,8 +117,7 @@ namespace ScrumPokerBot.Domain
         {
             if (ScrumPokerSessions.Any())
             {
-                var ids = ScrumPokerSessions.Select(s => s.Id).ToArray();
-                messageSender.SendConnections(user, ids);
+                messageSender.SendConnections(user, ScrumPokerSessions.ToArrayLocked());
             }
             else
             {

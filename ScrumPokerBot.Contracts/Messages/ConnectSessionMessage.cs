@@ -20,6 +20,6 @@ namespace ScrumPokerBot.Contracts.Messages
         public int Sessionid { get; }
         public bool IsValid { get; }
 
-        private readonly string regexPattern = @"^\/connect (\d{1,3})$";
+        private readonly string regexPattern = @"^\/connect (\d{1,3}).*$";
     }
 }

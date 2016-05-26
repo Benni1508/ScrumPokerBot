@@ -213,7 +213,7 @@ namespace ScrumPokerBot.Domain.Tests
             service.StartNewSession(TestHelpers.GetTestUser(2));
 
             service.SendConnections(TestHelpers.GetTestUser(3));
-            this.messageSender.Received().SendConnections(Arg.Any<PokerUser>(), Arg.Is<int[]>(i => i.Contains(12) && i.Contains(13)));
+            this.messageSender.Received().SendConnections(Arg.Any<PokerUser>(), Arg.Is<ScrumPokerSession[]>(i => i.Any(s => s.Id == 12) && i.Any(s => s.Id== 13)));
         }
 
         [Fact]

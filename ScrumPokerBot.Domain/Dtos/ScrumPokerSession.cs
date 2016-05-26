@@ -42,17 +42,16 @@ namespace ScrumPokerBot.Domain.Dtos
             Poker = new RunningPoker(this);
         }
 
-        public bool Estimate(PokerUser user, int estimation)
+        public void Estimate(PokerUser user, int estimation)
         {
             var userEstimation = Poker.Users.FirstOrDefault(ue => ue.User.ChatId == user.ChatId);
             if (userEstimation != null && !userEstimation.EstimationReceived)
             {
                 userEstimation.SetEstimation(estimation);
             }
-            return IsEstimationCompleted();
         }
 
-        private bool IsEstimationCompleted()
+        public bool IsEstimationCompleted()
         {
             return Poker.Users.All(u => u.EstimationReceived);
         }
