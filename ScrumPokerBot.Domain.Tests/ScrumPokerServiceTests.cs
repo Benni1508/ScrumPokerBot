@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
@@ -203,6 +204,23 @@ namespace ScrumPokerBot.Domain.Tests
             this.messageSender.ClearReceivedCalls();
             service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
 
+            messageSender.Received().AllreadyConnected(Arg.Any<PokerUser>());
+        }
+
+        [Fact]
+        public void Connect_WhenAlreadyConnected2()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(1));
+            service.StartNewSession(TestHelpers.GetTestUser(2));
+            this.messageSender.ClearReceivedCalls();
+            service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
+
+            var session1 = service.ScrumPokerSessions.First(s => s.Id == 12);
+            var session2= service.ScrumPokerSessions.First(s => s.Id == 13);
+
+            session1.AllUsers.Count().Should().Be(1);
+            session2.AllUsers.Count().Should().Be(1);
+            
             messageSender.Received().AllreadyConnected(Arg.Any<PokerUser>());
         }
 

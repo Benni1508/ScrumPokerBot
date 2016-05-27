@@ -39,6 +39,7 @@ namespace ScrumPokerBot.Domain
             if (GetSession(user) != null)
             {
                 messageSender.AllreadyConnected(user);
+                return;
             }
 
             if (session != null && session.AllUsers.All(u => u.ChatId != user.ChatId))
