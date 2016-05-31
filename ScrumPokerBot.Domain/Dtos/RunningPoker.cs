@@ -18,7 +18,7 @@ namespace ScrumPokerBot.Domain.Dtos
         public override string ToString()
         {
             var groupedEstimations = this.Users.GroupBy(u => u.Estimation).OrderBy(e => e.Key);
-            var results = groupedEstimations.ToDictionary(k => k.Key, v => v.Count());
+            var results = groupedEstimations.Where(e => e.Key >= 0).ToDictionary(k => k.Key, v => v.Count());
             var sb = new StringBuilder();
             foreach (var result in results)
             {
@@ -28,6 +28,24 @@ namespace ScrumPokerBot.Domain.Dtos
             if (results.Count > 1)
             {
                 sb.AppendLine(AppendHighestAndLowest(results));
+            }
+
+            var canceldUsers = GetCancelUsers();
+            if (!string.IsNullOrEmpty(canceldUsers))
+            {
+                sb.AppendLine("Benutzer ohne Schätzung");
+                sb.AppendLine(this.GetCancelUsers());
+            }
+
+            return sb.ToString();
+        }
+
+        private string GetCancelUsers()
+        {
+            var sb = new StringBuilder();
+            foreach (var user in Users.Where(u => u.Estimation == -1))
+            {
+                sb.AppendLine(user.User.ToString());
             }
 
             return sb.ToString();
@@ -47,6 +65,14 @@ namespace ScrumPokerBot.Domain.Dtos
             sb.AppendLine($"Höchste Schätzung {highest.Estimation} von {highest.User}");
 
             return sb.ToString();
+        }
+
+        public void Complete()
+        {
+            foreach (var userEstimation in Users.Where(u => !u.EstimationReceived))
+            {
+                userEstimation.SetEstimation(-1);
+            }
         }
     }
 }

@@ -241,5 +241,42 @@ namespace ScrumPokerBot.Domain.Tests
             this.messageSender.Received().NoRunningSession(Arg.Any<PokerUser>());
         }
 
+
+        [Fact]
+        public void CancelPoker_withoutSession()
+        {
+            service.CancelPoker(TestHelpers.GetTestUser(123));
+            this.messageSender.Received().NoSessionForUser(Arg.Any<PokerUser>()); 
+        }
+        [Fact]
+        public void CancelPoker_withoutPokerSession()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.CancelPoker(TestHelpers.GetTestUser(123));
+            this.messageSender.Received().NoPokerRunning(Arg.Any<PokerUser>()); 
+        }
+
+        [Fact]
+        public void CancelPoker_withPokerSessionNoMaster()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.ConnectToSession(TestHelpers.GetTestUser(124),12);
+            service.StartPoker(TestHelpers.GetTestUser(123),"");
+            
+            service.CancelPoker(TestHelpers.GetTestUser(124));
+            this.messageSender.Received().NotMasterUser(Arg.Any<PokerUser>()); 
+        }
+
+        [Fact]
+        public void CancelPoker()
+        {
+            service.StartNewSession(TestHelpers.GetTestUser(123));
+            service.ConnectToSession(TestHelpers.GetTestUser(124), 12);
+        
+            service.StartPoker(TestHelpers.GetTestUser(123),"");
+            service.CancelPoker(TestHelpers.GetTestUser(123));
+            this.messageSender.Received().SendPokerResult(Arg.Any<ScrumPokerSession>(), Arg.Any<string>()); 
+        }
+
     }
 }

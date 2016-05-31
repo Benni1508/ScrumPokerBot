@@ -5,7 +5,7 @@ using ScrumPokerBot.Domain.Interfaces;
 namespace ScrumPokerBot.Domain
 {
     public class MessageHandlers : IHandle<StartSessionMessage>, IHandle<ConnectSessionMessage>,
-        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>, IHandle<UnknownCommandMessage>, IHandle<GetSessionUsersMessage>
+        IHandle<StartPokerMessage>, IHandle<EstimationMessage>, IHandle<LeaveSessionMessage>, IHandle<CancelPokerMessage>, IHandle<UnknownCommandMessage>, IHandle<GetSessionUsersMessage>
     {
         private readonly IScrumPokerService service;
         private readonly IMessageSender messageSender;
@@ -21,6 +21,7 @@ namespace ScrumPokerBot.Domain
             bus.Subscribe<EstimationMessage>(this);
             bus.Subscribe<LeaveSessionMessage>(this);
             bus.Subscribe<UnknownCommandMessage>(this);
+            bus.Subscribe<CancelPokerMessage>(this);
         }
 
         public void Handle(StartSessionMessage message)
@@ -65,6 +66,11 @@ namespace ScrumPokerBot.Domain
         public void Handle(GetSessionUsersMessage message)
         {
             this.service.ShowAllUsers(message.User);
+        }
+
+        public void Handle(CancelPokerMessage message)
+        {
+            this.service.CancelPoker(message.User);
         }
     }
 }

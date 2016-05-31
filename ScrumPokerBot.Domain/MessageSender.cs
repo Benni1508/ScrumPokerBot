@@ -163,8 +163,8 @@ namespace ScrumPokerBot.Domain
 
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {
-            var masterText = $"Der Benutzer {any.Lastname}, {any.Firstname} wurde der Session hinzugefügt.";
-            var otherText = $"Du nimmst an der Sitzung von {masterUser.Lastname}, {masterUser.Firstname} teil.";
+            var masterText = $"Der Benutzer {any} wurde der Session hinzugefügt.";
+            var otherText = $"Du nimmst an der Sitzung von {masterUser} teil.";
             bot.SendTextMessage(any.ChatId, otherText);
             bot.SendTextMessage(masterUser.ChatId, masterText);
         }

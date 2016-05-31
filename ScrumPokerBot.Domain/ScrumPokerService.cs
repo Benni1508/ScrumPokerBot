@@ -126,6 +126,21 @@ namespace ScrumPokerBot.Domain
             }
         }
 
+        public void CancelPoker(PokerUser user)
+        {
+            if (!EnsureSession(user) || !EnsureMasterUser(user))
+                return;
+
+            var session = GetSession(user);
+            if (session.CanStartPoker)
+            {
+                messageSender.NoPokerRunning(user);
+                return;
+            }
+            session.Poker.Complete();
+            messageSender.SendPokerResult(session, session.Poker.ToString());
+        }
+
         private void CloseSession(ScrumPokerSession session)
         {
             var users = session.AllUsers.ToArray();
