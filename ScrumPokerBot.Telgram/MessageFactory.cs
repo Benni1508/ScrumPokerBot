@@ -43,7 +43,7 @@ namespace ScrumPokerBot.Telgram
                     case "/leavesession":
                         bus.Publish(new LeaveSessionMessage(user, message.Text));
                         return;
-                    case "/sessionusers":
+                    case "/showusers":
                         bus.Publish(new GetSessionUsersMessage(user, message.Text));
                         return;
                     default:
