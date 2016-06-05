@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Configuration;
+using System.IO;
 using Ninject.Modules;
 using Telegram.Bot;
 
@@ -8,7 +9,8 @@ namespace ScrumPokerBot.Telgram
     {
         public override void Load()
         {
-            var apikey = File.ReadAllText("C:\\Temp\\ApiKey.txt");
+            var keyString = ConfigurationManager.AppSettings["ApiKeyFile"];
+            var apikey = File.ReadAllText(keyString);
             Bind<Api>().ToConstant(new Api(apikey)).InSingletonScope();
             Bind<IBotService>().To<BotService>().InSingletonScope();
             Bind<IMessageFactory>().To<MessageFactory>();
