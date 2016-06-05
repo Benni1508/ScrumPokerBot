@@ -40,7 +40,7 @@ namespace ScrumPokerBot.Telgram
                     case "/poker":
                         bus.Publish(new StartPokerMessage(user, message.Text));
                         return;
-                    case "/cancelpoker":
+                    case "/endpoker":
                         bus.Publish(new CancelPokerMessage(user, message.Text));
                         return;
                     case "/leavesession":
