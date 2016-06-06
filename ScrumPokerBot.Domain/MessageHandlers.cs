@@ -49,7 +49,7 @@ namespace ScrumPokerBot.Domain
 
         public void Handle(EstimationMessage message)
         {
-            service.Estimate(message.User, message.Estimation);
+            service.Estimate(message.User, message.Estimation, message.MessageId);
         }
 
 

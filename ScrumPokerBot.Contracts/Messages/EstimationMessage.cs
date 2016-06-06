@@ -25,5 +25,12 @@ namespace ScrumPokerBot.Contracts.Messages
         public bool IsValid { get; }
 
         private readonly string RegexPattern = "^(\\d*) Story Points$";
+
+        public EstimationMessage(PokerUser pokerUser, string data, int messageId) : this(pokerUser, data)
+        {
+            this.MessageId = messageId;
+        }
+
+        public int MessageId { get; set; }
     }
 }

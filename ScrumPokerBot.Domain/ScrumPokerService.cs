@@ -82,28 +82,32 @@ namespace ScrumPokerBot.Domain
             messageSender.SendPokerToUsers(session.AllUsers, description);
         }
 
-        public void Estimate(PokerUser user, int estimation)
+        public void Estimate(PokerUser user, int estimation, int messageId = 0)
         {
             var session = GetSession(user);
             if (!EnsureSession(user)) return;
 
-            if (session.CanStartPoker)
+            if (session.Poker == null)
             {
                 messageSender.NoPokerRunning(user);
                 return;
             }
+
             if (!session.CanUserEstimate(user))
             {
                 messageSender.EstimationAlreadyCounted(user);
             }
 
-            session.Estimate(user, estimation);
-
-            if (session.IsEstimationCompleted())
+            session.Estimate(user, estimation, messageId);
+            if (messageId != 0)
             {
-                messageSender.SendPokerResult(session, session.Poker.ToString());
-                session.ClearPoker();
+                messageSender.UpdateEstimation(user, estimation, messageId);
             }
+
+            if (!session.IsEstimationCompleted()) return;
+
+            messageSender.SendPokerResult(session, session.Poker.ToString());
+            session.ClearPoker();
         }
 
         public void ShowAllUsers(PokerUser user)

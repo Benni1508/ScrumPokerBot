@@ -160,6 +160,13 @@ namespace ScrumPokerBot.Domain
             bot.SendTextMessage(user.ChatId, text);
         }
 
+        public async void UpdateEstimation(PokerUser user, int estimation, int messageId)
+        {
+            var text = $"Deine Schätzung von {estimation} Story Points wurde gewertet!";
+            await bot.EditMessageText(user.ChatId, messageId, text);
+
+        }
+
 
         public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
         {

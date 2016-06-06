@@ -24,5 +24,6 @@ namespace ScrumPokerBot.Domain.Interfaces
         void SendConnections(PokerUser user, ScrumPokerSession[] sessions);
         void NoRunningSession(PokerUser user);
         void AllreadyConnected(PokerUser user);
+        void UpdateEstimation(PokerUser user, int estimation, int messageId);
     }
 }

@@ -65,7 +65,7 @@ namespace ScrumPokerBot.Telgram
         {
             PokerUser pokerUser = new PokerUser(callbackQuery.From);
            
-            var estimation = new EstimationMessage(pokerUser, callbackQuery.Data);
+            var estimation = new EstimationMessage(pokerUser, callbackQuery.Data, callbackQuery.Message.MessageId);
             if (estimation.IsValid)
             {
                 bus.Publish(estimation);
