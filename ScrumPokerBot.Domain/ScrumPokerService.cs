@@ -35,7 +35,7 @@ namespace ScrumPokerBot.Domain
         public void ConnectToSession(PokerUser user, int sessionId, int messageId =0)
         {
             var session = GetSession(sessionId);
-
+            
             if (GetSession(user) != null)
             {
                 messageSender.AllreadyConnected(user);
@@ -120,6 +120,12 @@ namespace ScrumPokerBot.Domain
 
         public void SendConnections(PokerUser user)
         {
+            if (GetSession(user) != null)
+            {
+                messageSender.AllreadyConnected(user);
+                return;
+            }
+
             if (ScrumPokerSessions.Any())
             {
                 messageSender.SendConnections(user, ScrumPokerSessions.ToArrayLocked());
@@ -143,6 +149,7 @@ namespace ScrumPokerBot.Domain
             }
             session.Poker.Complete();
             messageSender.SendPokerResult(session, session.Poker.ToString());
+            session.ClearPoker();
         }
 
         private void CloseSession(ScrumPokerSession session)
