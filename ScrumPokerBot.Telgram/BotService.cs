@@ -41,10 +41,29 @@ namespace ScrumPokerBot.Telgram
                     }
                     foreach (var update in updates)
                     {
-                        Console.WriteLine($"{update.Message.From.Id}: \t ({update.Message.Type})  {update.Message.Text}");
+                        switch (update.Type)
+                        {
+                            case UpdateType.UnkownUpdate:
+                                break;
+                            case UpdateType.MessageUpdate:
+                                Console.WriteLine($"{update.Message.From.Id}: \t ({update.Message.Type})  {update.Message.Text}");
+                                HandleUpdate(update.Message);
+                                break;
+                            case UpdateType.InlineQueryUpdate:
+                                break;
+                            case UpdateType.ChosenInlineResultUpdate:
+                                break;
+                            case UpdateType.CallbackQueryUpdate:
+                                Console.WriteLine($"{update.CallbackQuery.From.Id}: \t (CallbackQuery)  {update.CallbackQuery.Data}");
+                                HandleUpdate(update.CallbackQuery);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                      
                         offset = update.Id + 1;
 
-                        HandleUpdate(update);
+               
                     }
                     await Task.Delay(1000);
                 }
@@ -55,13 +74,17 @@ namespace ScrumPokerBot.Telgram
             }
         }
 
-        private void HandleUpdate(Update update)
+        private void HandleUpdate(CallbackQuery callbackQuery)
         {
-            if (update.Message == null) return;
-            switch (update.Message.Type)
+            messageFactory.PublishMessage(callbackQuery);
+        }
+
+        private void HandleUpdate(Message message)
+        {
+            switch (message.Type)
             {
                 case MessageType.TextMessage:
-                    messageFactory.PublishMessage(update.Message);
+                    messageFactory.PublishMessage(message);
                     break;
                 case MessageType.PhotoMessage:
                 case MessageType.UnknownMessage:
@@ -73,13 +96,10 @@ namespace ScrumPokerBot.Telgram
                 case MessageType.LocationMessage:
                 case MessageType.ContactMessage:
                 case MessageType.ServiceMessage:
-                    Console.WriteLine($"Message of Type {update.Message.Type} received!");
+                    Console.WriteLine($"Message of Type {message.Type} received!");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
-            }
-            if (update.Message != null && update.Message.Type == MessageType.TextMessage)
-            {
             }
         }
 

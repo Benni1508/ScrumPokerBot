@@ -1,3 +1,4 @@
+using System.CodeDom;
 using System.Text;
 using Telegram.Bot.Types;
 
@@ -15,6 +16,14 @@ namespace ScrumPokerBot.Contracts
             Firstname = chat.FirstName;
             Lastname = chat.LastName;
             ChatId = chat.Id;
+        }
+
+        public PokerUser(User @from)
+        {
+            this.ChatId = from.Id;
+            Firstname = from.FirstName;
+            Lastname = from.LastName;
+            ChatId = from.Id;
         }
 
         public string Username { get; set; }

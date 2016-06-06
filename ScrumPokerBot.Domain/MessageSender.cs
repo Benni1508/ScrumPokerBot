@@ -11,22 +11,22 @@ namespace ScrumPokerBot.Domain
 {
     internal class MessageSender : IMessageSender
     {
-        private static readonly string[][] keyboard =
+        private static readonly InlineKeyboardButton[][] keyboard =
         {
-            new[] {"0 Story Points"},
-            new[] {"1 Story Points"},
-            new[] {"2 Story Points"},
-            new[] {"3 Story Points"},
-            new[] {"5 Story Points"},
-            new[] {"8 Story Points"},
-            new[] {"13 Story Points"},
-            new[] {"20 Story Points"}
+            new[] {new InlineKeyboardButton("0 Story Points")},
+            new[] {new InlineKeyboardButton("1 Story Points")},
+            new[] {new InlineKeyboardButton("2 Story Points")},
+            new[] {new InlineKeyboardButton("3 Story Points")},
+            new[] {new InlineKeyboardButton("5 Story Points")},
+            new[] {new InlineKeyboardButton("8 Story Points")},
+            new[] {new InlineKeyboardButton("13 Story Points")},
+            new[] {new InlineKeyboardButton("20 Story Points")}
         };
 
         private static readonly string Connection = "/connect {0} von {1}";
 
         private readonly Api bot;
-        private readonly ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup {Keyboard = keyboard};
+        private readonly InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup(keyboard);
 
         public MessageSender(Api bot)
         {
@@ -75,7 +75,7 @@ namespace ScrumPokerBot.Domain
                 : $"Gib deine Schätzung für {description} ab.";
             foreach (var user in allUsers)
             {
-                bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkup);
+                bot.SendTextMessage(user.ChatId, text, false,false, 0, keyboardMarkup);
             }
         }
 
@@ -142,10 +142,10 @@ namespace ScrumPokerBot.Domain
 
         public void SendConnections(PokerUser user, ScrumPokerSession[] sessions)
         {
-            var keyboardLayout = sessions.Select(s => new [] {string.Format(Connection, s.Id, s.MasterUser)}).ToList();
-            var keyboardMarkupInternal = new ReplyKeyboardMarkup {Keyboard = keyboardLayout.ToArray()};
+            var keyboardLayout = sessions.Select(s => new [] {new KeyboardButton(string.Format(Connection, s.Id, s.MasterUser))}).ToArray();
+            var keyboardMarkupInternal = new ReplyKeyboardMarkup(keyboardLayout);
             var text = "Wähle die Session!";
-            bot.SendTextMessage(user.ChatId, text, false, 0, keyboardMarkupInternal);
+            bot.SendTextMessage(user.ChatId, text, false,false ,0, keyboardMarkupInternal);
         }
 
         public void NoRunningSession(PokerUser user)

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Contracts.Messages;
 using Telegram.Bot.Types;
@@ -57,6 +59,17 @@ namespace ScrumPokerBot.Telgram
             
          bus.Publish(new UnknownCommandMessage(user, message.Text));
             
+        }
+
+        public void PublishMessage(CallbackQuery callbackQuery)
+        {
+            PokerUser pokerUser = new PokerUser(callbackQuery.From);
+           
+            var estimation = new EstimationMessage(pokerUser, callbackQuery.Data);
+            if (estimation.IsValid)
+            {
+                bus.Publish(estimation);
+            }
         }
     }
 }
