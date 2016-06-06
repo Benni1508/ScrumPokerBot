@@ -4,9 +4,10 @@ namespace ScrumPokerBot.Contracts.Messages
 {
     public class ConnectSessionMessage : TelegramMessageBase
     {
-        public ConnectSessionMessage(PokerUser user, string message)
+        public ConnectSessionMessage(PokerUser user, string message, int messageId =0)
             : base(user, message)
         {
+
             var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
             if (!regex.IsMatch(message)) return;
 
@@ -15,7 +16,10 @@ namespace ScrumPokerBot.Contracts.Messages
             int value;
             this.IsValid = int.TryParse(x.Value, out value);
             this.Sessionid = value;
+            this.MessageId = messageId;
         }
+
+        public int MessageId { get; private set; }
 
         public int Sessionid { get; }
         public bool IsValid { get; }

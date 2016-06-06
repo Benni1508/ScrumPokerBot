@@ -46,7 +46,7 @@ namespace ScrumPokerBot.Domain.Tests
             service.StartNewSession(TestHelpers.GetTestUser(1));
             service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
             messageSender.Received()
-                .InformaAddedUserAndMaster(Arg.Is<PokerUser>(p => p.ChatId == 2), Arg.Is<PokerUser>(p => p.ChatId == 1));
+                .InformaAddedUserAndMaster(Arg.Is<PokerUser>(p => p.ChatId == 2), Arg.Is<PokerUser>(p => p.ChatId == 1),0);
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace ScrumPokerBot.Domain.Tests
             service.ConnectToSession(TestHelpers.GetTestUser(2), 12);
             service.ScrumPokerSessions.First().AllUsers.Length.Should().Be(2);
 
-            messageSender.Received().InformaAddedUserAndMaster(Arg.Any<PokerUser>(), Arg.Any<PokerUser>());
+            messageSender.Received().InformaAddedUserAndMaster(Arg.Any<PokerUser>(), Arg.Any<PokerUser>(),0);
         }
 
         [Fact]

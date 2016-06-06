@@ -32,7 +32,7 @@ namespace ScrumPokerBot.Domain
             return newSession.Id;
         }
 
-        public void ConnectToSession(PokerUser user, int sessionId)
+        public void ConnectToSession(PokerUser user, int sessionId, int messageId =0)
         {
             var session = GetSession(sessionId);
 
@@ -45,7 +45,7 @@ namespace ScrumPokerBot.Domain
             if (session != null && session.AllUsers.All(u => u.ChatId != user.ChatId))
             {
                 session.AddUser(user);
-                messageSender.InformaAddedUserAndMaster(user, session.MasterUser);
+                messageSender.InformaAddedUserAndMaster(user, session.MasterUser, messageId);
             }
             if (session == null)
             {

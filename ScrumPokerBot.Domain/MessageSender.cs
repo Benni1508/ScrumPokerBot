@@ -23,7 +23,8 @@ namespace ScrumPokerBot.Domain
             new[] {new InlineKeyboardButton("20 Story Points")}
         };
 
-        private static readonly string Connection = "/connect {0} von {1}";
+        private static readonly string ConnectionData = "/connect {0} von {1}";
+        private static readonly string ConnectionText = "Session von {0}";
 
         private readonly Api bot;
         private readonly InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup(keyboard);
@@ -142,10 +143,19 @@ namespace ScrumPokerBot.Domain
 
         public void SendConnections(PokerUser user, ScrumPokerSession[] sessions)
         {
-            var keyboardLayout = sessions.Select(s => new [] {new KeyboardButton(string.Format(Connection, s.Id, s.MasterUser))}).ToArray();
-            var keyboardMarkupInternal = new ReplyKeyboardMarkup(keyboardLayout);
+            var keyboardLayout = sessions.Select(s => new[]
+            {
+                GetButton(s)
+            }).ToArray();
+            var keyboardMarkupInternal = new InlineKeyboardMarkup(keyboardLayout);
             var text = "Wähle die Session!";
             bot.SendTextMessage(user.ChatId, text, false,false ,0, keyboardMarkupInternal);
+        }
+
+        private static InlineKeyboardButton GetButton(ScrumPokerSession s)
+        {
+            return new InlineKeyboardButton(string.Format(ConnectionText, s.MasterUser),
+                string.Format(ConnectionData, s.Id, s.MasterUser));
         }
 
         public void NoRunningSession(PokerUser user)
@@ -168,12 +178,20 @@ namespace ScrumPokerBot.Domain
         }
 
 
-        public void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser)
+        public async void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser, int messageId)
         {
             var masterText = $"Der Benutzer {any} wurde der Session hinzugefügt.";
             var otherText = $"Du nimmst an der Sitzung von {masterUser} teil.";
-            bot.SendTextMessage(any.ChatId, otherText);
-            bot.SendTextMessage(masterUser.ChatId, masterText);
+            if (messageId == 0)
+            {
+                await bot.SendTextMessage(any.ChatId, otherText);
+            }
+            else
+            {
+               await bot.EditMessageText(any.ChatId, messageId, otherText);
+            }
+            await bot.SendTextMessage(masterUser.ChatId, masterText);
         }
+
     }
 }

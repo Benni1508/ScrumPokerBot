@@ -6,7 +6,7 @@ namespace ScrumPokerBot.Domain.Interfaces
 {
     public interface IMessageSender
     {
-        void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser);
+        void InformaAddedUserAndMaster(PokerUser any, PokerUser masterUser, int messageId);
         void SendStartSessionToMaster(PokerUser user, int sessionId);
         void SendUnknownCommand(UnknownCommandMessage message);
         void NoSessionFound(PokerUser user, int sessionId);

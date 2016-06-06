@@ -6,7 +6,7 @@ namespace ScrumPokerBot.Domain.Interfaces
     public interface IScrumPokerService
     {
         int StartNewSession(PokerUser user);
-        void ConnectToSession(PokerUser user, int sessionId);
+        void ConnectToSession(PokerUser user, int sessionId, int messageId);
         void StartPoker(PokerUser user, string description);
         void LeaveSession(PokerUser user);
         void Estimate(PokerUser user, int estimation, int  messageId = 0);

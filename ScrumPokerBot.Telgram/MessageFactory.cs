@@ -69,7 +69,11 @@ namespace ScrumPokerBot.Telgram
             if (estimation.IsValid)
             {
                 bus.Publish(estimation);
+                return;
             }
+
+            var connectMessage = new ConnectSessionMessage(pokerUser, callbackQuery.Data, callbackQuery.Message.MessageId);
+            bus.Publish(connectMessage);
         }
     }
 }

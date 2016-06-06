@@ -33,7 +33,7 @@ namespace ScrumPokerBot.Domain
         {
             if (message.IsValid)
             {
-                service.ConnectToSession(message.User, message.Sessionid);
+                service.ConnectToSession(message.User, message.Sessionid, message.MessageId);
             }
             else
             {
