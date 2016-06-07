@@ -113,6 +113,8 @@ namespace ScrumPokerBot.Domain
         public void ShowAllUsers(PokerUser user)
         {
             var session = GetSession(user);
+            
+            if (!EnsureSession(user)) return;
             if (!EnsureMasterUser(user)) return;
 
             messageSender.SendUsers(session.AllUsers, user);
