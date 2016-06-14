@@ -1,7 +1,8 @@
-using System.Linq;
+using System.Configuration;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.Dtos;
 using ScrumPokerBot.Domain.Interfaces;
+using System.Linq;
 
 namespace ScrumPokerBot.Domain
 {
@@ -33,7 +34,7 @@ namespace ScrumPokerBot.Domain
             return newSession.Id;
         }
 
-        public void ConnectToSession(PokerUser user, int sessionId, int messageId =0)
+        public void ConnectToSession(PokerUser user, int sessionId, int messageId = 0)
         {
             var session = GetSession(sessionId);
             
@@ -153,6 +154,21 @@ namespace ScrumPokerBot.Domain
             session.Poker.Complete();
             messageSender.SendPokerResult(session, session.Poker.ToString());
             session.ClearPoker();
+        }
+
+        public void ShowSessions(PokerUser user)
+        {
+            if (user.Username != ConfigurationManager.AppSettings["SuperUser"])
+            {
+                return;
+                
+            }
+            if (this.ScrumPokerSessions.Any())
+                this.messageSender.SendSessions(user, this.ScrumPokerSessions.ToArrayLocked());
+            else
+            {
+                this.messageSender.NoSessionFound(user, 0);
+            }
         }
 
         private void CloseSession(ScrumPokerSession session)

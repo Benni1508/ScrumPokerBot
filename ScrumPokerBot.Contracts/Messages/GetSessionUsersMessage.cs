@@ -6,4 +6,11 @@
         {
         }
     }
+
+    public class ShowSessionsMessage : TelegramMessageBase {
+        public ShowSessionsMessage(PokerUser user, string message) 
+            : base(user, message)
+        {
+        }
+    }
 }
