@@ -25,6 +25,7 @@ namespace ScrumPokerBot.Domain
             if (existingSession != null)
             {
                 messageSender.UserAlreadyInSession(user);
+                return 0;
             }
             var newSession = new ScrumPokerSession(user, idGenerator.GetId());
             ScrumPokerSessions.Add(newSession);
