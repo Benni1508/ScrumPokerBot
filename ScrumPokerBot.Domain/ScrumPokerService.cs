@@ -93,7 +93,6 @@ namespace ScrumPokerBot.Domain
                 return;
             }
 
-
             if (!session.CanUserEstimate(user))
             {
                 messageSender.EstimationAlreadyCounted(user);
