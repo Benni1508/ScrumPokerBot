@@ -1,9 +1,9 @@
-using System.Linq;
-using System.Text;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Contracts.Messages;
 using ScrumPokerBot.Domain.Dtos;
 using ScrumPokerBot.Domain.Interfaces;
+using System.Linq;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -175,6 +175,17 @@ namespace ScrumPokerBot.Domain
             var text = $"Deine Schätzung von {estimation} Story Points wurde gewertet!";
             await bot.EditMessageText(user.ChatId, messageId, text);
 
+        }
+
+        public void SendSessions(PokerUser user, ScrumPokerSession[] sessions)
+        {
+            var sb = new StringBuilder();
+            foreach (var scrumPokerSession in sessions)
+            {
+                sb.AppendLine($"Session {scrumPokerSession.Id} von {scrumPokerSession.MasterUser}");
+            }
+
+            bot.SendTextMessage(user.ChatId, sb.ToString());
         }
 
 

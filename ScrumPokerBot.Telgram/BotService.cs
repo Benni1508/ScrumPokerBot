@@ -27,6 +27,7 @@ namespace ScrumPokerBot.Telgram
 
         private async Task Runner()
         {
+            var currentId = 0;
             var offset = 0;
             while (true)
             {
@@ -35,18 +36,20 @@ namespace ScrumPokerBot.Telgram
                     var updates = await bot.GetUpdates(offset);
                     if (firstRun)
                     {
-                        offset = IgnoreMessages(updates);
+                        offset =  IgnoreMessages(updates);
                         firstRun = false;
                         continue;
                     }
                     foreach (var update in updates)
                     {
+                        currentId = update.Id;
                         switch (update.Type)
                         {
                             case UpdateType.UnkownUpdate:
                                 break;
                             case UpdateType.MessageUpdate:
-                                Console.WriteLine($"{update.Message.From.Id}: \t ({update.Message.Type})  {update.Message.Text}");
+                                Console.WriteLine(
+                                    $"{update.Message.From.Id}: \t ({update.Message.Type})  {update.Message.Text}");
                                 HandleUpdate(update.Message);
                                 break;
                             case UpdateType.InlineQueryUpdate:
@@ -54,22 +57,21 @@ namespace ScrumPokerBot.Telgram
                             case UpdateType.ChosenInlineResultUpdate:
                                 break;
                             case UpdateType.CallbackQueryUpdate:
-                                Console.WriteLine($"{update.CallbackQuery.From.Id}: \t (CallbackQuery)  {update.CallbackQuery.Data}");
+                                Console.WriteLine(
+                                    $"{update.CallbackQuery.From.Id}: \t (CallbackQuery)  {update.CallbackQuery.Data}");
                                 HandleUpdate(update.CallbackQuery);
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
-                      
-                        offset = update.Id + 1;
-
-               
                     }
+                    offset = currentId + 1;
                     await Task.Delay(1000);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
+                    offset = currentId + 1;
                 }
             }
         }

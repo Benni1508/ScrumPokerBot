@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Threading;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NSubstitute;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Domain.Dtos;
 using ScrumPokerBot.Domain.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace ScrumPokerBot.Domain.Tests
@@ -113,6 +111,7 @@ namespace ScrumPokerBot.Domain.Tests
             service.StartNewSession(TestHelpers.GetTestUser(123));
             service.StartNewSession(TestHelpers.GetTestUser(123));
 
+            service.ScrumPokerSessions.Count().Should().Be(1);
             service.ScrumPokerSessions.First().AllUsers.Length.Should().Be(1);
 
             messageSender.Received().UserAlreadyInSession(Arg.Any<PokerUser>());

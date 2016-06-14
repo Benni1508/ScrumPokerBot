@@ -13,5 +13,6 @@ namespace ScrumPokerBot.Domain.Interfaces
         void ShowAllUsers(PokerUser user);
         void SendConnections(PokerUser user);
         void CancelPoker(PokerUser user);
+        void ShowSessions(PokerUser user);
     }
 }

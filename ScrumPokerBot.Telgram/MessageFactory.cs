@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using ScrumPokerBot.Contracts;
 using ScrumPokerBot.Contracts.Messages;
 using Telegram.Bot.Types;
@@ -36,7 +34,6 @@ namespace ScrumPokerBot.Telgram
                         return;
                     case "/connect":
                         var connectMessage = new ConnectSessionMessage(user, message.Text);
-
                         bus.Publish(connectMessage);
                         return;
                     case "/poker":
@@ -50,6 +47,9 @@ namespace ScrumPokerBot.Telgram
                         return;
                     case "/showusers":
                         bus.Publish(new GetSessionUsersMessage(user, message.Text));
+                        return;
+                    case "/showsessions":
+                        bus.Publish(new ShowSessionsMessage(user, message.Text));
                         return;
                     default:
                         bus.Publish(new UnknownCommandMessage(user, message.Text));
